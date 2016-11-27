@@ -1,6 +1,9 @@
 #include "stdio.h"
 #include "stdarg.h"
 #include "uart.h"
+#include "pwm.h"
+#include "pca.h"
+
 #include "../HMI/cmd_queue.h"
 
 #define S2RI  0x01              //S2CON.0
@@ -59,6 +62,7 @@ UART interrupt service routine
 void Uart_Isr() interrupt 4 using 3   //RTX定时中断用了1
 {
 	uint8_t Buf = SBUF;
+	static uint8_t flag = 0;
 
     if (RI)
     {			
@@ -66,6 +70,22 @@ void Uart_Isr() interrupt 4 using 3   //RTX定时中断用了1
 
 		//---------------------------------------------------------
 		S2BUF = Buf;
+
+		pStepMotor->curSpeed = Buf;
+
+		if(flag)
+		{
+			flag = 0;
+			pDCMotorEnable[Buf](ENABLE);
+			S_ENABLE2 = 0;
+			
+		}
+		else
+		{
+			flag = 1;
+			pDCMotorEnable[Buf](DISABLE);
+			S_ENABLE2 = 1;
+		}
 		//---------------------------------------------------------
     }
     if (TI)
@@ -132,6 +152,7 @@ void Uart2_Isr() interrupt 8 using 3   //RTX定时中断用了1
     {
         S2CON &= ~S2RI;         //??S2RI?
 
+#if 0
 		//queue_push(Buf);
 
 		//调用上面的push函数有问题
@@ -144,6 +165,7 @@ void Uart2_Isr() interrupt 8 using 3   //RTX定时中断用了1
 
 		//Buf = 0x00;
 	 	//queue_pop(&Buf);
+#endif
 
 		//SBUF = Buf;
     }

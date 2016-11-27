@@ -1,5 +1,10 @@
 #include "io.h"
 #include "common.h"
+#include "pca.h"
+
+//传感器状态
+static SensorStatus_TypeDef sensorStatus;
+SensorStatus_TypeDef *pSensorStatus = &sensorStatus;
 
 //IO初始化
 void IO_Init(void)
@@ -56,4 +61,58 @@ void IO_Init(void)
 //	
 //	//T2H = 0xFD;            //9600波特率(24MHz,1T)
 //	//T2L = 0x8F;
+}
+
+/*
+ * 蜂鸣器驱动
+ * 参数：mode: 0:一直响
+ *		 	   1:鸣叫5声
+ */
+void beepAlarm(unsigned char mode)
+{
+	unsigned char i;
+	switch(mode)
+	{
+		case 0:
+			DRV_BEEP = 1;
+			break;
+		case 1:
+			for(i=0;i<5;i++)
+			{
+				DRV_BEEP = 1;
+				os_wait(K_TMO, 100, 0);  //等待100个时钟滴答(ticks),即1s
+				DRV_BEEP = 0;
+				os_wait(K_TMO, 100, 0);  //等待100个时钟滴答(ticks),即1s
+			}
+			break;
+		default:
+			break;
+	}
+}
+
+void sensorCheck(void)
+{
+	sensorStatus.preStatus = sensorStatus.curStatus;
+
+	EAIN1 ? (sensorStatus.curStatus |= SENSOR1_MASK) : (sensorStatus.curStatus &= ~SENSOR1_MASK);
+	EAIN2 ? (sensorStatus.curStatus |= SENSOR2_MASK) : (sensorStatus.curStatus &= ~SENSOR2_MASK);
+	EAIN3 ? (sensorStatus.curStatus |= SENSOR3_MASK) : (sensorStatus.curStatus &= ~SENSOR3_MASK);
+	EAIN4 ? (sensorStatus.curStatus |= SENSOR4_MASK) : (sensorStatus.curStatus &= ~SENSOR4_MASK);
+	EAIN5 ? (sensorStatus.curStatus |= SENSOR5_MASK) : (sensorStatus.curStatus &= ~SENSOR5_MASK);
+	EAIN6 ? (sensorStatus.curStatus |= SENSOR6_MASK) : (sensorStatus.curStatus &= ~SENSOR6_MASK);
+	EAIN7 ? (sensorStatus.curStatus |= SENSOR7_MASK) : (sensorStatus.curStatus &= ~SENSOR7_MASK);
+	EAIN8 ? (sensorStatus.curStatus |= SENSOR8_MASK) : (sensorStatus.curStatus &= ~SENSOR8_MASK);
+	
+	sensorStatus.fallingEdge = (sensorStatus.curStatus ^ sensorStatus.preStatus) & sensorStatus.preStatus;
+
+	//检测到10个上升沿后，停止步进电机
+	if(sensorStatus.fallingEdge & SENSOR1_MASK)
+	{
+		static uint8_t cnt = 0;
+		if(cnt++ > 5)
+		{
+			cnt = 0;
+			pStepMotor->pStepMotorEnable(DISABLE);
+		}
+	}	
 }

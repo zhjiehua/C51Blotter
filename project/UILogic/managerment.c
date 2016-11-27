@@ -17,7 +17,7 @@ ProjectMan_TypeDef *pProjectMan = &ProjectMan;
 
 void tipsPageProcess(void)
 {
-//提示页面分类按钮处理
+	//提示页面分类按钮处理
 	switch(pProjectMan->tipsSource)
 	{
 	//tips1页面
