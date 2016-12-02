@@ -123,7 +123,7 @@ void ProcessMessage( PCTRL_MSG msg, uint16 size )
 				switch(control_type)
 				{
 				case kCtrlButton: //按钮控件
-					cDebug("NotifyButton(), %d, %d, %d\n", screen_id, control_id, msg->param[1]);
+					//cDebug("NotifyButton(), %d, %d, %d\n", screen_id, control_id, msg->param[1]);
 					NotifyButton(screen_id,control_id,msg->param[1]);
 					break;
 				case kCtrlText://文本控件

@@ -1,10 +1,6 @@
 #include "io.h"
 #include "common.h"
-#include "pca.h"
-
-//传感器状态
-static SensorStatus_TypeDef sensorStatus;
-SensorStatus_TypeDef *pSensorStatus = &sensorStatus;
+#include "uart.h"
 
 //IO初始化
 void IO_Init(void)
@@ -88,31 +84,4 @@ void beepAlarm(unsigned char mode)
 		default:
 			break;
 	}
-}
-
-void sensorCheck(void)
-{
-	sensorStatus.preStatus = sensorStatus.curStatus;
-
-	EAIN1 ? (sensorStatus.curStatus |= SENSOR1_MASK) : (sensorStatus.curStatus &= ~SENSOR1_MASK);
-	EAIN2 ? (sensorStatus.curStatus |= SENSOR2_MASK) : (sensorStatus.curStatus &= ~SENSOR2_MASK);
-	EAIN3 ? (sensorStatus.curStatus |= SENSOR3_MASK) : (sensorStatus.curStatus &= ~SENSOR3_MASK);
-	EAIN4 ? (sensorStatus.curStatus |= SENSOR4_MASK) : (sensorStatus.curStatus &= ~SENSOR4_MASK);
-	EAIN5 ? (sensorStatus.curStatus |= SENSOR5_MASK) : (sensorStatus.curStatus &= ~SENSOR5_MASK);
-	EAIN6 ? (sensorStatus.curStatus |= SENSOR6_MASK) : (sensorStatus.curStatus &= ~SENSOR6_MASK);
-	EAIN7 ? (sensorStatus.curStatus |= SENSOR7_MASK) : (sensorStatus.curStatus &= ~SENSOR7_MASK);
-	EAIN8 ? (sensorStatus.curStatus |= SENSOR8_MASK) : (sensorStatus.curStatus &= ~SENSOR8_MASK);
-	
-	sensorStatus.fallingEdge = (sensorStatus.curStatus ^ sensorStatus.preStatus) & sensorStatus.preStatus;
-
-	//检测到10个上升沿后，停止步进电机
-	if(sensorStatus.fallingEdge & SENSOR1_MASK)
-	{
-		static uint8_t cnt = 0;
-		if(cnt++ > 5)
-		{
-			cnt = 0;
-			pStepMotor->pStepMotorEnable(DISABLE);
-		}
-	}	
 }

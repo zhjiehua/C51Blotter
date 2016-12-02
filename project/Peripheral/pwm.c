@@ -17,7 +17,7 @@ static void dcMotor12Enable(Status sta){ sta ? (EN_MOT12 = 0) : (EN_MOT12 = 1);}
 
 //PWM初始化
 void PWM_Init(void)
-{
+{ 
 	uint8_t i;
 
 	pDCMotorEnable[0] = dcMotor1Enable;
@@ -34,18 +34,6 @@ void PWM_Init(void)
 	pDCMotorEnable[11] = dcMotor12Enable;
 
 	//停止所有直流电机
-//	EN_MOT01 = 1;
-//	EN_MOT02 = 1;
-//	EN_MOT03 = 1;
-//	EN_MOT04 = 1;
-//	EN_MOT05 = 1;
-//	EN_MOT06 = 1;
-//	EN_MOT07 = 1;
-//	EN_MOT08 = 1;
-//	EN_MOT09 = 1;
-//	EN_MOT10 = 1;
-//	EN_MOT11 = 1;
-//	EN_MOT12 = 1;
 	for(i=0;i<DCMOTOR_COUNT;i++)
 	{
 		pDCMotorEnable[i](DISABLE);
@@ -97,4 +85,7 @@ void PWM3_SetPwmWide(unsigned short Wide)
     }
 }
 
-
+void PWM_SetCycle(uint16_t cycle)
+{
+	
+}

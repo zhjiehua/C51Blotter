@@ -34,9 +34,9 @@ typedef void (*pMotorFun_Typedef)(Status sta);
 #define CYCLE   0x1000L     //定义PWM周期(最大值为32767)
 #define DUTY    10L         //定义占空比为10%
 
-#define DCMOTOR_COUNT 12
+#define DCMOTOR_COUNT 12   //直流电机数量
 
-//#define PWM4OUT
+#define PWM4OUT  //取消注释使能PWM4输出
 
 extern pMotorFun_Typedef pDCMotorEnable[DCMOTOR_COUNT];
 

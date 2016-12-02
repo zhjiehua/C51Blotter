@@ -18,4 +18,16 @@ typedef unsigned int uint16_t;
 //#define FOSC 11059200L      //System frequency
 #define FOSC 20000000L      //System frequency
 
+typedef enum
+{
+	DISABLE = 0,
+	ENABLE = 1,
+}Status;
+
+typedef enum
+{
+	CW = 0,	//正转
+	CCW,	//反转
+}Direction_TypeDef;
+
 #endif

@@ -581,14 +581,19 @@
               <FilePath>.\Peripheral\uart.c</FilePath>
             </File>
             <File>
-              <FileName>pwm.c</FileName>
+              <FileName>stepmotor.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Peripheral\pwm.c</FilePath>
+              <FilePath>.\Peripheral\stepmotor.c</FilePath>
             </File>
             <File>
-              <FileName>pca.c</FileName>
+              <FileName>dcmotor.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Peripheral\pca.c</FilePath>
+              <FilePath>.\Peripheral\dcmotor.c</FilePath>
+            </File>
+            <File>
+              <FileName>sensor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Peripheral\sensor.c</FilePath>
             </File>
           </Files>
         </Group>

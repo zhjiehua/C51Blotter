@@ -1,8 +1,9 @@
 #include "stdio.h"
 #include "stdarg.h"
 #include "uart.h"
-#include "pwm.h"
-#include "pca.h"
+#include "dcmotor.h"
+#include "stepmotor.h"
+#include "io.h"
 
 #include "../HMI/cmd_queue.h"
 
@@ -15,7 +16,7 @@
 static bit Uart_Busy = 0;
 static bit Uart2_Busy = 0;
 
-//串口初始化，串口波特率发生器用的是定时器1
+//串口初始化，串口波特率发生器用的是定时器2
 void Uart_Init(void)
 {
 	if(BAUD > 9600)
@@ -36,24 +37,31 @@ void Uart_Init(void)
 
 	//AUXR = 0x40;      		//定时器工作在1T模式，这一位一定要设置，否则进入不了中断
 	//AUXR = 0x54;
-	AUXR = 0xD4;			//T0为1T模式；T1位1T模式，T1为串口1波特率发生器；T2为1T模式，并启动定时器2，T2为串口2波特率发生器
+	//AUXR = 0xD4;			//T0为1T模式；T1位1T模式，T1为串口1波特率发生器；T2为1T模式，并启动定时器2，T2为串口2波特率发生器
+	AUXR = 0x55;			//定时器2为串口1的波特率发生器
+	//AUXR = 0x15;
+	
 	AUXR1 &= ~0xC0;			//串口1在P30/P31
-	TMOD |= 0x20;           //Set Timer1 as 8-bit auto reload mode
-	if(BAUD <= 9600)
-	{
-		TH1 = TL1 = 256 - (FOSC/32/BAUD); //Set auto-reload vaule
-	}	 
-	else
-	{
-		TH1 = TL1 = 256 - (FOSC/32/BAUD*2);
-	}
+
+//	TMOD |= 0x20;           //Set Timer1 as 8-bit auto reload mode
+//	if(BAUD <= 9600)
+//	{
+//		TH1 = TL1 = 256 - (FOSC/32/BAUD); //Set auto-reload vaule
+//	}	 
+//	else
+//	{
+//		TH1 = TL1 = 256 - (FOSC/32/BAUD*2);
+//	}
 	
 	T2L = (65536 - (FOSC/4/BAUD));   //设置波特率重装值
 	T2H = (65536 - (FOSC/4/BAUD))>>8;
 
-	IE2 = 0x01; 			//使能串口2中断	 
-	TR1 = 1;                //Timer1 start run
-	ES = 1;                 //Enable UART interrupt
+	IE2 = 0x01; 			//使能串口2中断
+	ES = 1;                 //使能串口1中断
+	//TR1 = 1;                //启动定时器1
+
+	IP |= 0x10;  //串口1优先级高
+	IP2 |= 0x01;  //串口2优先级高
 }
 
 /*----------------------------
@@ -71,21 +79,26 @@ void Uart_Isr() interrupt 4 using 3   //RTX定时中断用了1
 		//---------------------------------------------------------
 		S2BUF = Buf;
 
-		pStepMotor->curSpeed = Buf;
-
-		if(flag)
-		{
-			flag = 0;
-			pDCMotorEnable[Buf](ENABLE);
-			S_ENABLE2 = 0;
-			
-		}
-		else
-		{
-			flag = 1;
-			pDCMotorEnable[Buf](DISABLE);
-			S_ENABLE2 = 1;
-		}
+//		if(flag)
+//		{
+//			flag = 0;
+//			LED2 = 0;
+//				
+//			//pDCMotor->control = Buf;
+//
+//			pStepMotor->SetSpeed(Buf%speedLevelSize);
+//			pStepMotor->SetCMD(ENABLE);	
+//		}
+//		else
+//		{
+//			flag = 1;
+//			LED2 = 1;
+//
+//			//pDCMotor->control = 0x00;
+//
+//			pStepMotor->SetSpeed(Buf%speedLevelSize);
+//			pStepMotor->SetCMD(DISABLE);
+//		}
 		//---------------------------------------------------------
     }
     if (TI)
@@ -152,7 +165,7 @@ void Uart2_Isr() interrupt 8 using 3   //RTX定时中断用了1
     {
         S2CON &= ~S2RI;         //??S2RI?
 
-#if 0
+#if 1
 		//queue_push(Buf);
 
 		//调用上面的push函数有问题
@@ -167,7 +180,7 @@ void Uart2_Isr() interrupt 8 using 3   //RTX定时中断用了1
 	 	//queue_pop(&Buf);
 #endif
 
-		//SBUF = Buf;
+		SBUF = Buf;
     }
     if (S2CON & S2TI)
     {
