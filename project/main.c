@@ -20,9 +20,12 @@ void startupTask(void) _task_ 0
 	//---------------初始化-------------------------------
 	IO_Init();
 	Uart_Init();//串口初始化
-//	Sensor_Init();
-//	DCMotor_Init();
-//	StepMotor_Init();
+
+	initUI();
+
+	Sensor_Init();
+	DCMotor_Init();
+	StepMotor_Init();
 
 	WDT_CONTR = 0x3F;//开看门狗，溢出时间1.1377s
 
@@ -35,7 +38,6 @@ void startupTask(void) _task_ 0
 	//---------------创建任务-----------------------------
 	os_create_task(1); 	//创建任务1
 	os_create_task(2);	//创建任务2
-	//os_create_task(3);	//创建任务3
 
 	//---------------删除该任务-----------------------------
  	os_delete_task(0);	//删除自己(task0),使task0退出任务链表
@@ -67,12 +69,12 @@ void UITask(void) _task_ 1
 		tipsPageProcess();
 #endif
 
-		P40 = 0;              
-		os_wait(K_TMO, 100, 0);  //等待100个时钟滴答(ticks),即1s
-					 //配置文件ConfTny.A51中INT_CLOCK EQU 10000; default is 10000 cycles
-					 //意思是时钟滴答为10000个机器周期。即10000*1uS=10ms
-		P40 = 1;
-		os_wait(K_TMO, 100, 0);
+//		P40 = 0;              
+//		os_wait(K_TMO, 100, 0);  //等待100个时钟滴答(ticks),即1s
+//					 //配置文件ConfTny.A51中INT_CLOCK EQU 10000; default is 10000 cycles
+//					 //意思是时钟滴答为10000个机器周期。即10000*1uS=10ms
+//		P40 = 1;
+//		os_wait(K_TMO, 100, 0);
     }  
 }
  
@@ -81,12 +83,12 @@ void workTask(void) _task_ 2
 {  
 	while(1)
 	{	
-//		LED2 = 1;              
-//		os_wait(K_TMO, 200, 0);  //等待100个时钟滴答(ticks),即1s
-//					 //配置文件ConfTny.A51中INT_CLOCK EQU 10000; default i s 10000 cycles
-//					 //意思是时钟滴答为10000个机器周期。即10000*1uS=10ms			 
-//		LED2 = 0;
-//		os_wait(K_TMO, 200, 0);
+		LED2 = 1;              
+		os_wait(K_TMO, 200, 0);  //等待100个时钟滴答(ticks),即1s
+					 //配置文件ConfTny.A51中INT_CLOCK EQU 10000; default i s 10000 cycles
+					 //意思是时钟滴答为10000个机器周期。即10000*1uS=10ms			 
+		LED2 = 0;
+		os_wait(K_TMO, 200, 0);
 
 		//步进电机驱动测试
 		//StepMotor_Test();
@@ -95,12 +97,3 @@ void workTask(void) _task_ 2
 		//DCMotor_Test();
     }  
 }  
-
-//void sensorTask(void) _task_ 3
-//{
-//	while(1)
-//	{
-//		//光电传感器检测
-//		pSensor->Scan();
-//	}
-//}

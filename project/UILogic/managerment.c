@@ -155,7 +155,7 @@ void initProjectMan(ProjectMan_TypeDef *pm)
 /************************************************************************/
 uint8 cmd_buffer[CMD_MAX_SIZE];
 
-void init(void)
+void initUI(void)
 {
 	//初始化项目结构体
 	char str[NAME_SIZE];

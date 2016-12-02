@@ -116,7 +116,7 @@ extern ProjectMan_TypeDef *pProjectMan;
 extern uint8 cmd_buffer[CMD_MAX_SIZE];
 
 void initProjectMan(ProjectMan_TypeDef *pm);
-void init(void);
+void initUI(void);
 
 //void uartInterrupt(uint8 data);
 //void loopForever(void);
