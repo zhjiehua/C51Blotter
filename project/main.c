@@ -83,17 +83,19 @@ void workTask(void) _task_ 2
 {  
 	while(1)
 	{	
-		LED2 = 1;              
-		os_wait(K_TMO, 200, 0);  //等待100个时钟滴答(ticks),即1s
-					 //配置文件ConfTny.A51中INT_CLOCK EQU 10000; default i s 10000 cycles
-					 //意思是时钟滴答为10000个机器周期。即10000*1uS=10ms			 
-		LED2 = 0;
-		os_wait(K_TMO, 200, 0);
+//		LED2 = 1;              
+//		os_wait(K_TMO, 200, 0);  //等待100个时钟滴答(ticks),即1s
+//					 //配置文件ConfTny.A51中INT_CLOCK EQU 10000; default i s 10000 cycles
+//					 //意思是时钟滴答为10000个机器周期。即10000*1uS=10ms			 
+//		LED2 = 0;
+//		os_wait(K_TMO, 200, 0);
 
 		//步进电机驱动测试
 		//StepMotor_Test();
 
 		//直流电机驱动测试
 		//DCMotor_Test();
+
+		loopForever();
     }  
 }  

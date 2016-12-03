@@ -54,6 +54,21 @@ sbit S_STEP2 = P3^4;
 
 #define SIZEOF(x) (sizeof(x)/sizeof((x)[0]))
 
+//typedef enum
+//{
+//	POS_PUMP1 = 1,
+//	POS_PUMP2 = 50,
+//	POS_PUMP3 = 49,
+//	POS_PUMP4 = 48,
+//	POS_PUMP5 = 47,
+//	POS_PUMP6 = 46,
+//	POS_PUMP7 = 45,
+//	POS_PUMP8 = 44,
+//
+//	POS_WASTE = 23,  //废液口
+//	POS_HANDLE = 28, //手动点
+//}AbsPos_TypeDef;
+
 typedef struct
 {
 	uint16_t speed;
@@ -62,7 +77,7 @@ typedef struct
 
 typedef enum
 {
-	SPEED_NONE,	//无
+	SPEED_NONE,	//静止或者匀速中
 	SPEED_ACC,  //加速
 	SPEED_DEC,	//减速
 	SPEED_STOP, //用于立即停止步进电机
@@ -70,10 +85,13 @@ typedef enum
 
 typedef struct
 {
-	uint8_t origin;
-	uint8_t curPos;  //当前位置
-	uint8_t desPos;  //目标位置
-	uint8_t cur;
+	uint8_t curCount;    //当前第几个信号
+	uint8_t desCount; 	 //计算第几个信号后停止电机，0表示不停	
+
+	int8_t curPos;  //当前位置，如果是顺时针旋转就++，否则--
+	//int8_t desPos;  //目标位置
+
+	Direction_TypeDef direction;  //记录方向
 
 	SpeedStatus_TypeDef speedStatus;
 	SpeedLevel_TypeDef *pSpeedLevel;  //速度级别数组
@@ -84,13 +102,22 @@ typedef struct
 
 	void (*SetSpeed)(uint8_t speedIndex);  //设置步进电机速度
 	void (*SetDir)(Direction_TypeDef dir);  //设置步进电机方向
-	void (*SetCMD)(Status sta);  //设置步进电机启动/停止
+	void (*SetCMD)(Status sta);  //设置步进电机加速/减速
 	void (*Stop)(void); //用于立即停止步进电机
-	void (*SetTimer)(Status sta); //用于直接启动或停止定时器，一般在主函数用
+
+	void (*SetPos)(uint8_t pos);
+	void (*UpdatePos)();
+	uint8_t (*IsOnPos)(void);
+
+	void (*Home)(void); //回原点
+	uint8_t (*Abs2Rel)(uint8_t absCoord);
+	void (*Position)(Direction_TypeDef dir, uint8_t dis);
+	void (*RelativePosition)(uint8_t desTank, uint8_t srcTank);
 }StepMotor_TypeDef;
 
 extern StepMotor_TypeDef *pStepMotor;
 extern const uint8_t speedLevelSize;
+extern const uint8_t AbsCoordinate[];
 
 void StepMotor_Init(void);
 void StepMotor_Test(void);

@@ -56,10 +56,17 @@ typedef struct
 {
 	uint8_t control;
 
+	uint8_t curCount;    //当前第几个信号
+	uint8_t desCount; 	 //计算第几个信号后停止电机，0表示不停
+
 	void (*SetCMD)(DCMotorEnum_TypeDef num, Status sta);
 	void (*SetDir)(DCMotorEnum_TypeDef num, Direction_TypeDef dir);
 	void (*SetSpeed)(DCMotorEnum_TypeDef num, uint16_t speed);
-	
+
+	void (*SetPos)(uint8_t pos);
+	void (*UpdatePos)();
+	uint8_t (*IsOnPos)(void);	
+
 	void (*WastePump_SetPos)(Position_TypeDef pos);	
 }DCMotor_TypeDef;
 

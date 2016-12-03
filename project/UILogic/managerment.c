@@ -192,14 +192,16 @@ void initUI(void)
 
 void loopForever(void)
 {
-	//处理UI数据
-	uint8 size = queue_find_cmd(cmd_buffer,CMD_MAX_SIZE); //从缓冲区中获取一条指令
-	if(size>0)//接受到指令
-	{
-		ProcessMessage((PCTRL_MSG)cmd_buffer, size);//处理指令
-	}
+//	//处理UI数据
+//	uint8 size = queue_find_cmd(cmd_buffer,CMD_MAX_SIZE); //从缓冲区中获取一条指令
+//	if(size>0)//接受到指令
+//	{
+//		ProcessMessage((PCTRL_MSG)cmd_buffer, size);//处理指令
+//	}
+//
+//	tipsPageProcess();
 
-	tipsPageProcess();
+	//purgeProgram();
 
 	/************************************************************************/
 	/*处理流程                                                              */
@@ -309,7 +311,8 @@ void loopForever(void)
 	break;
 	case RUNNING_BACKFLOW:
 		break;
-	case RUNNING_PURGE:
+	case RUNNING_PURGE:	 //执行清洗程序
+		purgeProgram();	
 		break;
 	case RUNNING_CALIBRATION:
 		break;

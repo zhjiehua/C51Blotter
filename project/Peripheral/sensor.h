@@ -28,6 +28,11 @@ sbit EAIN8 = P0^3;
 #define SENSOR8_MASK 0x80
 #define SENSORALL_MASK 0xFF
 
+#define SENSOR_POS  SENSOR1
+#define SENSOR_HOME SENSOR2
+#define SENSOR_UP   SENSOR3
+#define SENSOR_DOWN SENSOR4
+
 typedef enum
 {
 	SENSOR1 = 0,
@@ -58,9 +63,10 @@ typedef struct
 	CheckEdge_TypeDef checkEdge;   //ºÏ≤‚±ﬂ—ÿ¿‡–Õ
 
 	void (*Scan)(void);
-	void (*SetPos)(uint8_t pos);
 	void (*SetCheckEdge)(CheckEdge_TypeDef edge);
-	uint8_t (*IsOnPos)(uint8_t sensorNum);
+	//void (*SetPos)(uint8_t pos);
+	//uint8_t (*IsOnPos)(uint8_t sensorNum);
+	uint8_t (*GetStatus)(uint8_t sensorNum);
 }Sensor_TypeDef;
 
 extern Sensor_TypeDef *pSensor;

@@ -180,7 +180,7 @@ void Uart2_Isr() interrupt 8 using 3   //RTX定时中断用了1
 	 	//queue_pop(&Buf);
 #endif
 
-		SBUF = Buf;
+		//SBUF = Buf;
     }
     if (S2CON & S2TI)
     {

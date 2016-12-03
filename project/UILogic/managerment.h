@@ -119,7 +119,7 @@ void initProjectMan(ProjectMan_TypeDef *pm);
 void initUI(void);
 
 //void uartInterrupt(uint8 data);
-//void loopForever(void);
+void loopForever(void);
 
 void tipsPageProcess(void);
 

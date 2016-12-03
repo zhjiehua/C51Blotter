@@ -130,23 +130,6 @@
           <Name>(98=-1,-1,-1,-1,0)(82=-1,-1,-1,-1,0)(83=-1,-1,-1,-1,0)(84=-1,-1,-1,-1,0)(85=-1,-1,-1,-1,0)(99=-1202,215,-999,503,1)(91=-1,-1,-1,-1,0)(92=-1,-1,-1,-1,0)(5067=-1,-1,-1,-1,0)</Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
-      <Breakpoint>
-        <Bp>
-          <Number>0</Number>
-          <Type>0</Type>
-          <LineNumber>107</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>-16744602</Address>
-          <ByteObject>0</ByteObject>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>MAIN.C</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
-        </Bp>
-      </Breakpoint>
       <WatchWindow1>
         <Ww>
           <count>0</count>
@@ -187,7 +170,7 @@
 
   <Group>
     <GroupName>Source Group 1</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
@@ -196,10 +179,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>11</ColumnNumber>
+      <ColumnNumber>19</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>61</TopLine>
-      <CurrentLine>73</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\main.c</PathWithFileName>
       <FilenameWithoutPath>main.c</FilenameWithoutPath>
@@ -210,10 +193,10 @@
       <FileType>2</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>28</ColumnNumber>
+      <ColumnNumber>18</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>633</TopLine>
-      <CurrentLine>643</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\Conf_tny.A51</PathWithFileName>
       <FilenameWithoutPath>Conf_tny.A51</FilenameWithoutPath>
@@ -236,7 +219,7 @@
 
   <Group>
     <GroupName>HMI</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
@@ -245,10 +228,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>8</ColumnNumber>
+      <ColumnNumber>6</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>243</TopLine>
-      <CurrentLine>243</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\HMI\cmd_process.c</PathWithFileName>
       <FilenameWithoutPath>cmd_process.c</FilenameWithoutPath>
@@ -259,10 +242,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>29</ColumnNumber>
+      <ColumnNumber>2</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>1</TopLine>
-      <CurrentLine>16</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\HMI\cmd_queue.c</PathWithFileName>
       <FilenameWithoutPath>cmd_queue.c</FilenameWithoutPath>
@@ -275,8 +258,8 @@
       <Focus>0</Focus>
       <ColumnNumber>19</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>247</TopLine>
-      <CurrentLine>247</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\HMI\hmi_driver.c</PathWithFileName>
       <FilenameWithoutPath>hmi_driver.c</FilenameWithoutPath>
@@ -289,8 +272,8 @@
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>95</TopLine>
-      <CurrentLine>97</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\HMI\hmi_user_uart.c</PathWithFileName>
       <FilenameWithoutPath>hmi_user_uart.c</FilenameWithoutPath>
@@ -364,10 +347,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>22</ColumnNumber>
+      <ColumnNumber>8</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>168</TopLine>
-      <CurrentLine>182</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\UILogic\managerment.c</PathWithFileName>
       <FilenameWithoutPath>managerment.c</FilenameWithoutPath>
@@ -392,10 +375,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>12</ColumnNumber>
+      <ColumnNumber>21</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>112</TopLine>
-      <CurrentLine>127</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\UILogic\project.c</PathWithFileName>
       <FilenameWithoutPath>project.c</FilenameWithoutPath>
@@ -420,7 +403,7 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>3</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
@@ -434,10 +417,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>26</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>91</TopLine>
+      <CurrentLine>100</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\UILogic\purgePage.c</PathWithFileName>
       <FilenameWithoutPath>purgePage.c</FilenameWithoutPath>
@@ -448,7 +431,7 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>53</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
@@ -476,7 +459,7 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>24</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
@@ -525,20 +508,62 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>18</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>195</TopLine>
-      <CurrentLine>195</CurrentLine>
+      <TopLine>109</TopLine>
+      <CurrentLine>116</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\Peripheral\uart.c</PathWithFileName>
       <FilenameWithoutPath>uart.c</FilenameWithoutPath>
     </File>
+    <File>
+      <GroupNumber>4</GroupNumber>
+      <FileNumber>24</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>55</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>115</TopLine>
+      <CurrentLine>115</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>.\Peripheral\stepmotor.c</PathWithFileName>
+      <FilenameWithoutPath>stepmotor.c</FilenameWithoutPath>
+    </File>
+    <File>
+      <GroupNumber>4</GroupNumber>
+      <FileNumber>25</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>36</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>73</TopLine>
+      <CurrentLine>73</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>.\Peripheral\dcmotor.c</PathWithFileName>
+      <FilenameWithoutPath>dcmotor.c</FilenameWithoutPath>
+    </File>
+    <File>
+      <GroupNumber>4</GroupNumber>
+      <FileNumber>26</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>1</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>59</TopLine>
+      <CurrentLine>59</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>.\Peripheral\sensor.c</PathWithFileName>
+      <FilenameWithoutPath>sensor.c</FilenameWithoutPath>
+    </File>
   </Group>
 
   <AlienFiles>
-    <PathWithFilename>G:\GitHubRepository\C51Blotter\project\PERIPHERAL\COMMON.H</PathWithFilename>
-    <TopLine>1</TopLine>
-    <CurrentLine>9</CurrentLine>
+    <PathWithFilename>G:\GitHubRepository\C51Blotter\project\PERIPHERAL\STEPMOTOR.H</PathWithFilename>
+    <TopLine>104</TopLine>
+    <CurrentLine>116</CurrentLine>
     <Constant>0</Constant>
     <WindowPosition>
       <length>0</length>
@@ -562,9 +587,9 @@
   </AlienFiles>
 
   <AlienFiles>
-    <PathWithFilename>G:\GitHubRepository\C51Blotter\project\PERIPHERAL\UART.H</PathWithFilename>
-    <TopLine>1</TopLine>
-    <CurrentLine>6</CurrentLine>
+    <PathWithFilename>G:\GitHubRepository\C51Blotter\project\Peripheral\common.h</PathWithFilename>
+    <TopLine>17</TopLine>
+    <CurrentLine>33</CurrentLine>
     <Constant>0</Constant>
     <WindowPosition>
       <length>0</length>
@@ -588,9 +613,9 @@
   </AlienFiles>
 
   <AlienFiles>
-    <PathWithFilename>G:\GitHubRepository\C51Blotter\project\HMI\CMD_QUEUE.H</PathWithFilename>
-    <TopLine>10</TopLine>
-    <CurrentLine>24</CurrentLine>
+    <PathWithFilename>G:\GitHubRepository\C51Blotter\project\Peripheral\sensor.h</PathWithFilename>
+    <TopLine>28</TopLine>
+    <CurrentLine>34</CurrentLine>
     <Constant>0</Constant>
     <WindowPosition>
       <length>0</length>
@@ -614,9 +639,9 @@
   </AlienFiles>
 
   <AlienFiles>
-    <PathWithFilename>G:\GitHubRepository\C51Blotter\project\HMI\CMD_PROCESS.H</PathWithFilename>
-    <TopLine>1</TopLine>
-    <CurrentLine>14</CurrentLine>
+    <PathWithFilename>G:\GitHubRepository\C51Blotter\project\PERIPHERAL\DCMOTOR.H</PathWithFilename>
+    <TopLine>57</TopLine>
+    <CurrentLine>66</CurrentLine>
     <Constant>0</Constant>
     <WindowPosition>
       <length>0</length>
@@ -1980,61 +2005,61 @@
     <ActiveMDIGroup>0</ActiveMDIGroup>
     <MDIGroup>
       <Size>100</Size>
-      <ActiveTab>3</ActiveTab>
+      <ActiveTab>2</ActiveTab>
       <Documents>
         <Doc>
-          <Name>./HMI/CMD_PROCESS.H</Name>
-          <ColumnNumber>8</ColumnNumber>
-          <TopLine>1</TopLine>
-          <CurrentLine>14</CurrentLine>
+          <Name>./PERIPHERAL/SENSOR.H</Name>
+          <ColumnNumber>27</ColumnNumber>
+          <TopLine>28</TopLine>
+          <CurrentLine>34</CurrentLine>
         </Doc>
         <Doc>
-          <Name>.\HMI\cmd_queue.c</Name>
-          <ColumnNumber>29</ColumnNumber>
-          <TopLine>1</TopLine>
-          <CurrentLine>16</CurrentLine>
+          <Name>./PERIPHERAL/STEPMOTOR.H</Name>
+          <ColumnNumber>19</ColumnNumber>
+          <TopLine>104</TopLine>
+          <CurrentLine>116</CurrentLine>
         </Doc>
         <Doc>
-          <Name>.\UILogic\managerment.c</Name>
-          <ColumnNumber>22</ColumnNumber>
-          <TopLine>168</TopLine>
-          <CurrentLine>182</CurrentLine>
+          <Name>.\Peripheral\stepmotor.c</Name>
+          <ColumnNumber>14</ColumnNumber>
+          <TopLine>118</TopLine>
+          <CurrentLine>132</CurrentLine>
         </Doc>
         <Doc>
-          <Name>.\main.c</Name>
-          <ColumnNumber>11</ColumnNumber>
-          <TopLine>61</TopLine>
+          <Name>.\UILogic\purgePage.c</Name>
+          <ColumnNumber>26</ColumnNumber>
+          <TopLine>91</TopLine>
+          <CurrentLine>100</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>.\Peripheral\sensor.c</Name>
+          <ColumnNumber>1</ColumnNumber>
+          <TopLine>59</TopLine>
+          <CurrentLine>59</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>.\Peripheral\dcmotor.c</Name>
+          <ColumnNumber>36</ColumnNumber>
+          <TopLine>73</TopLine>
           <CurrentLine>73</CurrentLine>
         </Doc>
         <Doc>
-          <Name>.\Peripheral\uart.c</Name>
+          <Name>./PERIPHERAL/DCMOTOR.H</Name>
           <ColumnNumber>0</ColumnNumber>
-          <TopLine>195</TopLine>
-          <CurrentLine>195</CurrentLine>
+          <TopLine>57</TopLine>
+          <CurrentLine>66</CurrentLine>
         </Doc>
         <Doc>
-          <Name>./HMI/CMD_QUEUE.H</Name>
-          <ColumnNumber>7</ColumnNumber>
-          <TopLine>10</TopLine>
-          <CurrentLine>24</CurrentLine>
-        </Doc>
-        <Doc>
-          <Name>.\UILogic\project.c</Name>
-          <ColumnNumber>12</ColumnNumber>
-          <TopLine>112</TopLine>
-          <CurrentLine>127</CurrentLine>
-        </Doc>
-        <Doc>
-          <Name>./PERIPHERAL/UART.H</Name>
+          <Name>.\Peripheral\uart.c</Name>
           <ColumnNumber>18</ColumnNumber>
-          <TopLine>1</TopLine>
-          <CurrentLine>6</CurrentLine>
+          <TopLine>109</TopLine>
+          <CurrentLine>116</CurrentLine>
         </Doc>
         <Doc>
           <Name>./PERIPHERAL/COMMON.H</Name>
-          <ColumnNumber>26</ColumnNumber>
-          <TopLine>1</TopLine>
-          <CurrentLine>9</CurrentLine>
+          <ColumnNumber>3</ColumnNumber>
+          <TopLine>17</TopLine>
+          <CurrentLine>33</CurrentLine>
         </Doc>
       </Documents>
     </MDIGroup>

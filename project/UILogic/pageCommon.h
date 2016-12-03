@@ -244,6 +244,7 @@ void runningPageRTCTimeoutProcess(uint16 control_id);
 void backflowPageButtonProcess(uint16 control_id, uint8  state);
 
 void purgePageButtonProcess(uint16 control_id, uint8  state);
+void purgeProgram(void);
 
 void caliPageButtonProcess(uint16 control_id, uint8  state);
 void caliPageEditProcess(uint16 control_id, uint8 *str);

@@ -2,9 +2,27 @@
 #include "io.h"
 #include "uart.h"
 #include "sensor.h"
+#include "stdlib.h"
+
+#define TANK_COUNT 50
 
 static StepMotor_TypeDef stepMotor;
 StepMotor_TypeDef *pStepMotor = &stepMotor;
+
+const uint8_t AbsCoordinate[10] = 
+{
+	31,  // POS_PUMP1 = 
+	30,	// POS_PUMP2 = 
+	29,	// POS_PUMP3 = 
+	28,	// POS_PUMP4 = 
+	27,	// POS_PUMP5 = 
+	26,	// POS_PUMP6 = 
+	25,	// POS_PUMP7 = 
+	24,	// POS_PUMP8 = 
+
+	3, //废液口 POS_WASTE = 
+	8, //手动点 POS_HANDLE = 	
+};
 
 ////快速
 //const SpeedLevel_TypeDef speedLevel[] = {
@@ -41,7 +59,17 @@ const uint8_t speedLevelSize = (sizeof(speedLevel)/sizeof(speedLevel[0]));
 //设置步进电机方向
 static void StepMotor_SetDir(Direction_TypeDef dir)
 {
-	dir ? (S_DIR2 = 1) : (S_DIR2 = 0);	//设置方向
+	//dir ? (S_DIR2 = 1; pStepMotor->direction = CCW) : (S_DIR2 = 0 ; pStepMotor->direction = CCW);	//设置方向
+	if(dir == CW)
+	{
+		S_DIR2 = 0;
+		pStepMotor->direction = CW;
+	}
+	else
+	{
+		S_DIR2 = 1;
+		pStepMotor->direction = CCW;
+	}
 }
 
 //设置步进电机速度
@@ -58,30 +86,205 @@ static void StepMotor_SetCMD(Status sta)
 		pStepMotor->speedStatus = SPEED_ACC;  //加速
 		pStepMotor->curSpeedIndex = 0;  //起始速度为最小速度
 
-		//TR1 = 1;  //启动定时器1
-		pStepMotor->control = 0x01;	
+		TR1 = 1;  //启动定时器1
+		//pStepMotor->control = 0x01;	
 	}
 	else
 	{
-		pStepMotor->speedStatus = SPEED_DEC;  //减速，减速到最小速度后会关掉定时器
+		pStepMotor->speedStatus = SPEED_DEC;  //减速，减速到最小速度
 
 		//TR1 = 0;  //停止定时器1
-		pStepMotor->control = 0x00;
+		//pStepMotor->control = 0x00;
 	}
 }
 
-//设置步进电机命令
+//设置步进电机停止命令
 static void StepMotor_Stop(void)
 {
 	pStepMotor->speedStatus = SPEED_STOP;
 	
-	pStepMotor->control = 0x00;
 	TF1 = 1; //进入定时器1中断		
 }
 
-static void StepMotor_SetTimer(Status sta)
+static void StepMotor_SetPos(uint8_t pos)
 {
-	sta ? (TR1 = 1) : (TR1 = 0);	
+	pStepMotor->curCount = 0;
+	pStepMotor->desCount = pos;	
+}
+
+static void StepMotor_UpdatePos(void)
+{
+	pStepMotor->curCount++;
+
+	if(pStepMotor->direction == CW)
+	{
+		pStepMotor->curPos++;
+		if(pStepMotor->curPos >= TANK_COUNT)
+			pStepMotor->curPos = 0;	
+	}
+	else
+	{
+		pStepMotor->curPos--;
+		if(pStepMotor->curPos < 0)
+			pStepMotor->curPos = TANK_COUNT-1;
+	}
+	
+	//Uart_SendData(pStepMotor->curPos);			
+}
+
+static uint8_t StepMotor_IsOnPos()
+{
+	return (pStepMotor->curCount >= pStepMotor->desCount); 		
+}
+
+//转盘回原点
+static void StepMotor_Home(void)
+{
+	pSensor->SetCheckEdge(FALLINGEDGE);
+
+	pStepMotor->SetPos(1);
+	pStepMotor->SetSpeed(8);  //第8级速度
+	pStepMotor->SetDir(CW);
+	pStepMotor->SetCMD(ENABLE);
+
+	while(!pStepMotor->IsOnPos())
+	{
+		if(pSensor->GetStatus(SENSOR_HOME))
+			pStepMotor->UpdatePos();	
+	} 
+	pStepMotor->SetCMD(DISABLE);   //原点传感器检测到立即减速
+
+	pStepMotor->SetPos(2);
+	while(!pStepMotor->IsOnPos())
+	{
+		if(pSensor->GetStatus(SENSOR_POS))
+			pStepMotor->UpdatePos();	
+	} 
+	pStepMotor->Stop();	  //第2个位置检测到立即停止
+	
+	pStepMotor->curPos = 0;  //设置当前位置为0
+}
+
+//返回转盘转动坐标系的（相对）位置
+static uint8_t StepMotor_Abs2Rel(uint8_t absCoord)
+{
+	return ((absCoord + pStepMotor->curPos) % TANK_COUNT);	
+}
+
+//转盘转动坐标定位，dis为距离
+static void StepMotor_Position(Direction_TypeDef dir, uint8_t dis)
+{
+	pSensor->SetCheckEdge(FALLINGEDGE);
+	
+	//设置步进电机方向
+	if(dir == CW) 
+		pStepMotor->SetDir(CW);
+	else
+		pStepMotor->SetDir(CCW);
+	
+	//
+	if(dis == 1)
+	{
+		pStepMotor->SetSpeed(5);  //第5级速度
+		pStepMotor->SetPos(1);
+		pStepMotor->SetCMD(ENABLE);	
+		while(!pStepMotor->IsOnPos())
+		{
+			if(pSensor->GetStatus(SENSOR_POS))
+				pStepMotor->UpdatePos();	
+		} 
+		pStepMotor->Stop();   //终点到立即停止	
+	}
+	else if(dis == 2)
+	{
+		pStepMotor->SetSpeed(8);  //第8级速度
+		pStepMotor->SetPos(1);
+		pStepMotor->SetCMD(ENABLE);	
+		while(!pStepMotor->IsOnPos())
+		{
+			if(pSensor->GetStatus(SENSOR_POS))
+				pStepMotor->UpdatePos();	
+		}  
+		pStepMotor->SetCMD(DISABLE);   //前1个位置到立即减速
+		
+		pStepMotor->SetPos(1);
+		while(!pStepMotor->IsOnPos())
+		{
+			if(pSensor->GetStatus(SENSOR_POS))
+				pStepMotor->UpdatePos();	
+		} 
+		pStepMotor->Stop();	  //终点位置到立即停止	
+	}
+	else if(dis > 2)
+	{
+		pStepMotor->SetSpeed(8);  //第8级速度
+		pStepMotor->SetPos(dis - 2);
+		pStepMotor->SetCMD(ENABLE);	
+		while(!pStepMotor->IsOnPos())
+		{
+			if(pSensor->GetStatus(SENSOR_POS))
+				pStepMotor->UpdatePos();	
+		} 
+		pStepMotor->SetCMD(DISABLE);   //前2个位置到立即减速
+		
+		pStepMotor->SetPos(2);
+		while(!pStepMotor->IsOnPos())
+		{
+			if(pSensor->GetStatus(SENSOR_POS))
+				pStepMotor->UpdatePos();	
+		} 
+		pStepMotor->Stop();	  //终点位置到立即停止	
+	}			
+}
+
+//转盘相对坐标定位，srcTank要转到desTank的位置					   
+static void StepMotor_RelativePosition(uint8_t desTank, uint8_t srcTank)
+{
+	int8_t len;
+	uint8_t dis;
+	Direction_TypeDef dir;
+
+	len = desTank - srcTank;
+
+	if(len == 0)
+		return;
+
+	if(abs(len) > TANK_COUNT/2)
+	{
+		if(len > 0) //原来是顺时针
+			dir = CW;
+		else  //原来是逆时针
+			dir = CCW;
+
+		dis = TANK_COUNT - abs(len);
+	}
+	else
+	{
+		if(len > 0)
+			dir = CCW;
+		else
+			dir = CW;
+			
+		dis = abs(len);	
+	}
+
+	pStepMotor->Position(dir, dis);
+
+//	for(i=0;i<dis;i++)
+//	{
+//		if(dir == CW)
+//		{
+//			pStepMotor->curPos++;
+//			if(pStepMotor->curPos >= TANK_COUNT)
+//				pStepMotor->curPos = 0;
+//		}
+//		else
+//		{
+//			pStepMotor->curPos--;
+//			if(pStepMotor->curPos < 0)
+//				pStepMotor->curPos = TANK_COUNT-1;
+//		}
+//	}	
 }
 
 //步进电机初始化
@@ -96,10 +299,17 @@ void StepMotor_Init(void)
 	pStepMotor->SetDir = StepMotor_SetDir;
 	pStepMotor->SetCMD = StepMotor_SetCMD;
 	pStepMotor->Stop = StepMotor_Stop;
-	pStepMotor->SetTimer = StepMotor_SetTimer;
+
+	pStepMotor->SetPos = StepMotor_SetPos;
+	pStepMotor->UpdatePos = StepMotor_UpdatePos;
+	pStepMotor->IsOnPos = StepMotor_IsOnPos;
+
+	pStepMotor->Home = StepMotor_Home;
+	pStepMotor->Abs2Rel = StepMotor_Abs2Rel;
+	pStepMotor->Position = StepMotor_Position;
+	pStepMotor->RelativePosition = StepMotor_RelativePosition;
 
 	pStepMotor->control = 0x00;
-
 
 	S_SLEEP1 = 1;
 	S_ENABLE1 = 1;
@@ -158,13 +368,13 @@ void tm1_isr() interrupt 3 using 3
 			//Uart_SendData(0x02);
 		}
 
-		if(pStepMotor->curSpeedIndex <= 0)  //减速完后停止
+		if(pStepMotor->curSpeedIndex <= 0)  //减速到最小速度
 		{
 			pStepMotor->curSpeedIndex = 0;
 			pStepMotor->speedStatus = SPEED_NONE;
 			
 			cnt = 0;
-			TR1 = 0;  //停止定时器1
+			//TR1 = 0;  //停止定时器1
 		}
 	}
 	else if(pStepMotor->speedStatus == SPEED_STOP)
@@ -176,7 +386,7 @@ void tm1_isr() interrupt 3 using 3
 		TR1 = 0;  //停止定时器1
 		//TF1 = 0;
 
-		Uart_SendData(0x03);
+		//Uart_SendData(0x03);
 	}
 
 	//更新定时器
@@ -188,12 +398,16 @@ void StepMotor_Test(void)
 {
 	if(pStepMotor->control == 0x01) //启动定时器
 	{
-		pSensor->SetPos(1);
+		pStepMotor->SetPos(1);
 		pSensor->SetCheckEdge(FALLINGEDGE);
 
-		pStepMotor->SetTimer(ENABLE); //启动定时器1
+		//pStepMotor->SetTimer(ENABLE); //启动定时器1
 
-		while(!pSensor->IsOnPos(SENSOR1));
+		while(!pStepMotor->IsOnPos())
+		{
+			if(pSensor->GetStatus(SENSOR_POS))
+				pStepMotor->UpdatePos();	
+		}
 		//pStepMotor->SetCMD(DISABLE);
 		pStepMotor->Stop();
 	}

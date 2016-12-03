@@ -176,32 +176,57 @@ static void DCMotor_SetDir(DCMotorEnum_TypeDef num, Direction_TypeDef dir)
 	}	
 }
 
-void DCMotor_WastePump_SetPos(Position_TypeDef pos)
+static void DCMotor_SetPos(uint8_t pos)
+{
+	pDCMotor->curCount = 0;
+	pDCMotor->desCount = pos;	
+}
+
+static void DCMotor_UpdatePos(void)
+{
+	pDCMotor->curCount++;		
+}
+
+static uint8_t DCMotor_IsOnPos()
+{
+	return (pDCMotor->curCount >= pDCMotor->desCount); 		
+}
+
+static void DCMotor_WastePump_SetPos(Position_TypeDef pos)
 {
 	if(pos == UP)
 	{
-		pSensor->SetPos(1);
 		pSensor->SetCheckEdge(RASINGEDGE);
-	
-		pDCMotor->SetSpeed(100-30);
+
+		pDCMotor->SetPos(1);
+		pDCMotor->SetSpeed(DCMOTOR10, 100-30);
 		//pDCMotor->SetSpeed(DCMOTOR10, 100); //CW方向时，100表示不转，0为最大速度
 		pDCMotor->SetDir(DCMOTOR10, CW);
 		pDCMotor->SetCMD(DCMOTOR10, ENABLE);
 
-		while(!pSensor->IsOnPos(SENSOR3));
+		while(!pDCMotor->IsOnPos())
+		{
+			if(pSensor->GetStatus(SENSOR_UP))
+				pDCMotor->UpdatePos();	
+		}
 		pDCMotor->SetCMD(DCMOTOR10, DISABLE);		
 	}
 	else
 	{
-		pSensor->SetPos(1);
 		pSensor->SetCheckEdge(RASINGEDGE);
 	
-		pDCMotor->SetSpeed(30);
+		pDCMotor->SetPos(1);
+		pDCMotor->SetSpeed(DCMOTOR10, 30);
 		//pDCMotor->SetSpeed(DCMOTOR10, 100);  //CCW方向时，0表示不转，100为最大速度
 		pDCMotor->SetDir(DCMOTOR10, CCW);
 		pDCMotor->SetCMD(DCMOTOR10, ENABLE);
 
-		while(!pSensor->IsOnPos(SENSOR4));
+		while(!pDCMotor->IsOnPos())
+		{
+			if(pSensor->GetStatus(SENSOR_DOWN))
+				pDCMotor->UpdatePos();	
+		}
+
 		pDCMotor->SetCMD(DCMOTOR10, DISABLE);
 		pDCMotor->SetDir(DCMOTOR10, CW);//废液泵电机停止的时候要拉高方向引脚		
 	}
@@ -216,6 +241,10 @@ void DCMotor_Init(void)
 	pDCMotor->SetCMD = DCMotor_SetCMD;
 	pDCMotor->SetSpeed = DCMotor_SetSpeed;
 	pDCMotor->SetDir = DCMotor_SetDir;
+
+	pDCMotor->SetPos = DCMotor_SetPos;
+	pDCMotor->UpdatePos = DCMotor_UpdatePos;
+	pDCMotor->IsOnPos = DCMotor_IsOnPos;
 
 	pDCMotor->WastePump_SetPos = DCMotor_WastePump_SetPos;
 
@@ -255,14 +284,18 @@ void DCMotor_Test(void)
 {
 	if(pDCMotor->control == 0x01)
 	{
-		pSensor->SetPos(1);
 		pSensor->SetCheckEdge(RASINGEDGE);
 	
+		pDCMotor->SetPos(1);
 		pDCMotor->SetSpeed(DCMOTOR1, 10);
 		pDCMotor->SetDir(DCMOTOR1, CW);
 		pDCMotor->SetCMD(DCMOTOR1, ENABLE);
 
-		while(!pSensor->IsOnPos(SENSOR3));
+		while(!pDCMotor->IsOnPos())
+		{
+			if(pSensor->GetStatus(SENSOR_UP))
+				pDCMotor->UpdatePos();	
+		}
 		pDCMotor->SetCMD(DCMOTOR1, DISABLE);
 
 		//pDCMotor->WastePump_SetPos(UP);
@@ -271,14 +304,18 @@ void DCMotor_Test(void)
 	}
 	else if(pDCMotor->control == 0x02)
 	{
-		pSensor->SetPos(1);
 		pSensor->SetCheckEdge(RASINGEDGE);
 	
+		pDCMotor->SetPos(1);
 		pDCMotor->SetSpeed(DCMOTOR1, 90);
 		pDCMotor->SetDir(DCMOTOR1, CW);
 		pDCMotor->SetCMD(DCMOTOR1, ENABLE);
 
-		while(!pSensor->IsOnPos(SENSOR3));
+		while(!pDCMotor->IsOnPos())
+		{
+			if(pSensor->GetStatus(SENSOR_UP))
+				pDCMotor->UpdatePos();	
+		}
 		pDCMotor->SetCMD(DCMOTOR1, DISABLE);
 
 		//pDCMotor->WastePump_SetPos(DOWN);

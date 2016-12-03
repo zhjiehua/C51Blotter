@@ -10,6 +10,9 @@
 //typedef unsigned char BYTE; //sizeof(BYTE) = 1
 //typedef unsigned int WORD;  //sizeof(WORD) = 2
 
+typedef signed char int8_t;
+typedef signed int int16_t;
+
 typedef unsigned char uint8_t;
 typedef unsigned int uint16_t;
 

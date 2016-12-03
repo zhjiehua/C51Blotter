@@ -127,7 +127,7 @@ void ProcessMessage( PCTRL_MSG msg, uint16 size )
 					NotifyButton(screen_id,control_id,msg->param[1]);
 					break;
 				case kCtrlText://文本控件
-					cDebug("NotifyText(), %d, %d, %s\n", screen_id, control_id, msg->param);
+					//cDebug("NotifyText(), %d, %d, %s\n", screen_id, control_id, msg->param);
 					NotifyText(screen_id,control_id,msg->param);
 					break;
 				case kCtrlProgress: //进度条控件
