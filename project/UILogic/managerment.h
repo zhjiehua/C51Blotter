@@ -43,6 +43,7 @@ typedef enum
 	RUNNING_BACKFLOW,
 	RUNNING_PURGE,
 	RUNNING_CALIBRATION,
+	RUNNING_HOME,
 }RunningType_TypeDef;
 
 typedef enum

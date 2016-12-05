@@ -80,7 +80,8 @@ typedef enum
 	SPEED_NONE,	//静止或者匀速中
 	SPEED_ACC,  //加速
 	SPEED_DEC,	//减速
-	SPEED_STOP, //用于立即停止步进电机
+	SPEED_STOP, //用于立即停止步进电机？？
+	SPEED_POSOFFSET,  //电机不能在传感器位置停止，这样当出现装盘晃动时会导致传感器检测到抖动
 }SpeedStatus_TypeDef;
 
 typedef struct
@@ -108,6 +109,7 @@ typedef struct
 	void (*SetPos)(uint8_t pos);
 	void (*UpdatePos)();
 	uint8_t (*IsOnPos)(void);
+	uint8_t (*IsStop)(void);
 
 	void (*Home)(void); //回原点
 	uint8_t (*Abs2Rel)(uint8_t absCoord);

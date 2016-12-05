@@ -3,6 +3,7 @@
 #include "string.h"
 #include "stdio.h"
 #include "../CPrintf.h"
+#include "../Peripheral/stepmotor.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -315,6 +316,12 @@ void loopForever(void)
 		purgeProgram();	
 		break;
 	case RUNNING_CALIBRATION:
+		break;
+	case RUNNING_HOME:
+		//»ØÔ­µã
+		pStepMotor->Home();
+		SetScreen(MAINPAGE_INDEX);
+		pProjectMan->runningType = RUNNING_NONE;
 		break;
 	default:
 		break;

@@ -6,6 +6,7 @@
 
 #include "../CPrintf.h"
 #include "../UILogic/pageCommon.h"
+#include "../UILogic/managerment.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -161,7 +162,8 @@ void ProcessMessage( PCTRL_MSG msg, uint16 size )
 		break;
 	case NOTIFY_ONLINE:
 		cDebug("NOTIFY_ONLINE\n");
-		SetScreen(MAINPAGE_INDEX);
+		pProjectMan->runningType = RUNNING_HOME;
+		//SetScreen(MAINPAGE_INDEX);
 		break;
 	default:
 		break;

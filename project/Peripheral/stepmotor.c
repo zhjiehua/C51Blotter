@@ -9,19 +9,34 @@
 static StepMotor_TypeDef stepMotor;
 StepMotor_TypeDef *pStepMotor = &stepMotor;
 
+//const uint8_t AbsCoordinate[10] = 
+//{
+//	31,  // POS_PUMP1 = 
+//	30,	// POS_PUMP2 = 
+//	29,	// POS_PUMP3 = 
+//	28,	// POS_PUMP4 = 
+//	27,	// POS_PUMP5 = 
+//	26,	// POS_PUMP6 = 
+//	25,	// POS_PUMP7 = 
+//	24,	// POS_PUMP8 = 
+//
+//	3, //废液口 POS_WASTE = 
+//	8, //手动点 POS_HANDLE = 	
+//};
+
 const uint8_t AbsCoordinate[10] = 
 {
-	31,  // POS_PUMP1 = 
-	30,	// POS_PUMP2 = 
-	29,	// POS_PUMP3 = 
-	28,	// POS_PUMP4 = 
-	27,	// POS_PUMP5 = 
-	26,	// POS_PUMP6 = 
-	25,	// POS_PUMP7 = 
-	24,	// POS_PUMP8 = 
+	20,  // POS_PUMP1 = 
+	21,	// POS_PUMP2 = 
+	22,	// POS_PUMP3 = 
+	23,	// POS_PUMP4 = 
+	24,	// POS_PUMP5 = 
+	25,	// POS_PUMP6 = 
+	26,	// POS_PUMP7 = 
+	27,	// POS_PUMP8 = 
 
-	3, //废液口 POS_WASTE = 
-	8, //手动点 POS_HANDLE = 	
+	48, //废液口 POS_WASTE = 
+	3, //手动点 POS_HANDLE = 	
 };
 
 ////快速
@@ -132,9 +147,14 @@ static void StepMotor_UpdatePos(void)
 	//Uart_SendData(pStepMotor->curPos);			
 }
 
-static uint8_t StepMotor_IsOnPos()
+static uint8_t StepMotor_IsOnPos(void)
 {
 	return (pStepMotor->curCount >= pStepMotor->desCount); 		
+}
+
+static uint8_t StepMotor_IsStop(void)
+{
+	return (TR1 == 0); 		
 }
 
 //转盘回原点
@@ -144,7 +164,7 @@ static void StepMotor_Home(void)
 
 	pStepMotor->SetPos(1);
 	pStepMotor->SetSpeed(8);  //第8级速度
-	pStepMotor->SetDir(CW);
+	pStepMotor->SetDir(CCW);
 	pStepMotor->SetCMD(ENABLE);
 
 	while(!pStepMotor->IsOnPos())
@@ -154,14 +174,15 @@ static void StepMotor_Home(void)
 	} 
 	pStepMotor->SetCMD(DISABLE);   //原点传感器检测到立即减速
 
-	pStepMotor->SetPos(2);
+	pStepMotor->SetPos(3);
 	while(!pStepMotor->IsOnPos())
 	{
 		if(pSensor->GetStatus(SENSOR_POS))
 			pStepMotor->UpdatePos();	
 	} 
-	pStepMotor->Stop();	  //第2个位置检测到立即停止
-	
+	pStepMotor->Stop();	  //第3个位置检测到立即停止
+	while(!pStepMotor->IsStop());	
+
 	pStepMotor->curPos = 0;  //设置当前位置为0
 }
 
@@ -185,7 +206,7 @@ static void StepMotor_Position(Direction_TypeDef dir, uint8_t dis)
 	//
 	if(dis == 1)
 	{
-		pStepMotor->SetSpeed(5);  //第5级速度
+		pStepMotor->SetSpeed(2);  //第5级速度
 		pStepMotor->SetPos(1);
 		pStepMotor->SetCMD(ENABLE);	
 		while(!pStepMotor->IsOnPos())
@@ -197,7 +218,7 @@ static void StepMotor_Position(Direction_TypeDef dir, uint8_t dis)
 	}
 	else if(dis == 2)
 	{
-		pStepMotor->SetSpeed(8);  //第8级速度
+		pStepMotor->SetSpeed(5);  //第8级速度
 		pStepMotor->SetPos(1);
 		pStepMotor->SetCMD(ENABLE);	
 		while(!pStepMotor->IsOnPos())
@@ -234,7 +255,12 @@ static void StepMotor_Position(Direction_TypeDef dir, uint8_t dis)
 				pStepMotor->UpdatePos();	
 		} 
 		pStepMotor->Stop();	  //终点位置到立即停止	
-	}			
+	}
+	
+	//等到电机真正停止
+	while(!pStepMotor->IsStop());
+
+	//偏移			
 }
 
 //转盘相对坐标定位，srcTank要转到desTank的位置					   
@@ -245,28 +271,35 @@ static void StepMotor_RelativePosition(uint8_t desTank, uint8_t srcTank)
 	Direction_TypeDef dir;
 
 	len = desTank - srcTank;
+	//len = srcTank - desTank;
 
 	if(len == 0)
 		return;
 
-	if(abs(len) > TANK_COUNT/2)
-	{
-		if(len > 0) //原来是顺时针
-			dir = CW;
-		else  //原来是逆时针
-			dir = CCW;
+//	if(abs(len) > TANK_COUNT/2)
+//	{
+//		if(len > 0) //原来是顺时针
+//			dir = CW;
+//		else  //原来是逆时针
+//			dir = CCW;
+//
+//		dis = TANK_COUNT - abs(len);
+//	}
+//	else
+//	{
+//		if(len > 0)
+//			dir = CCW;
+//		else
+//			dir = CW;
+//			
+//		dis = abs(len);	
+//	}
 
-		dis = TANK_COUNT - abs(len);
-	}
+	dir = CCW;
+	if(len < 0)
+		dis = TANK_COUNT + len;
 	else
-	{
-		if(len > 0)
-			dir = CCW;
-		else
-			dir = CW;
-			
-		dis = abs(len);	
-	}
+		dis = len;
 
 	pStepMotor->Position(dir, dis);
 
@@ -303,6 +336,7 @@ void StepMotor_Init(void)
 	pStepMotor->SetPos = StepMotor_SetPos;
 	pStepMotor->UpdatePos = StepMotor_UpdatePos;
 	pStepMotor->IsOnPos = StepMotor_IsOnPos;
+	pStepMotor->IsStop = StepMotor_IsStop;
 
 	pStepMotor->Home = StepMotor_Home;
 	pStepMotor->Abs2Rel = StepMotor_Abs2Rel;
@@ -380,13 +414,22 @@ void tm1_isr() interrupt 3 using 3
 	else if(pStepMotor->speedStatus == SPEED_STOP)
 	{
 		pStepMotor->curSpeedIndex = 0;
-		pStepMotor->speedStatus = SPEED_NONE;
+		pStepMotor->speedStatus = SPEED_POSOFFSET;
 
 		cnt = 0;
-		TR1 = 0;  //停止定时器1
-		//TF1 = 0;
+		//TR1 = 0;  //停止定时器1
 
+		//TF1 = 0;
 		//Uart_SendData(0x03);
+	}
+	else if(pStepMotor->speedStatus == SPEED_POSOFFSET)
+	{
+		if(cnt++ >= 450)
+		{
+			pStepMotor->speedStatus = SPEED_NONE;
+			TR1 = 0;  //停止定时器1
+			cnt = 0;	
+		}
 	}
 
 	//更新定时器

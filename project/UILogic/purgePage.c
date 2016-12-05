@@ -66,6 +66,38 @@ void purgePageButtonProcess(uint16 control_id, uint8  state)
 	}
 }
 
+void wasteFluidAbsorb(void)
+{
+	uint8_t relCoord;
+
+	//将废液槽转到废液口位置
+	relCoord = pStepMotor->Abs2Rel(AbsCoordinate[8]); //废液口位置
+	pStepMotor->RelativePosition(relCoord, AbsCoordinate[9]); //将废液槽转到废液口
+
+	//启动真空泵
+	pDCMotor->SetCMD(PUMP_VACUUM, ENABLE);
+
+	//放下废液口
+	pDCMotor->WastePump_SetPos(DOWN);
+
+	//延时一小段时间
+	os_wait(K_TMO, 6000, 0);
+	os_wait(K_TMO, 6000, 0);
+	os_wait(K_TMO, 6000, 0);
+	os_wait(K_TMO, 6000, 0);
+	os_wait(K_TMO, 6000, 0);
+	os_wait(K_TMO, 6000, 0);
+	os_wait(K_TMO, 6000, 0);
+	os_wait(K_TMO, 6000, 0);
+	os_wait(K_TMO, 6000, 0);
+
+	//提起废液口
+	pDCMotor->WastePump_SetPos(UP);
+
+	//停止真空泵
+	pDCMotor->SetCMD(PUMP_VACUUM, DISABLE);
+}
+
 void purgeProgram(void)
 {
 	uint8_t i;
@@ -81,7 +113,11 @@ void purgeProgram(void)
 		SetScreen(PURGEPAGE_INDEX);//跳转到清洗页面
 
 		//回原点
-		pStepMotor->Home();
+		//pStepMotor->Home();
+
+		//将手动点回原位
+		relCoord = pStepMotor->Abs2Rel(AbsCoordinate[9]);
+		pStepMotor->RelativePosition(relCoord, AbsCoordinate[9]); //AbsCoordinate[9]为8号槽（即手动点）
 
 		//提示将废液槽置于槽板号1的位置
 		SetScreen(TIPS1PAGE_INDEX);//跳转到提示2页面
@@ -100,32 +136,49 @@ void purgeProgram(void)
 				pStepMotor->RelativePosition(relCoord, AbsCoordinate[9]); //AbsCoordinate[8]为3号槽（即废液槽）
 
 				pDCMotor->SetSpeed(i, 10);
-				pDCMotor->SetCMD(i, ENABLE);
-				
+				pDCMotor->SetCMD(i, ENABLE);				
 				os_wait(K_TMO, 6000, 0);
 				os_wait(K_TMO, 6000, 0);
-				os_wait(K_TMO, 6000, 0);
-	
+				os_wait(K_TMO, 6000, 0);	
 				pDCMotor->SetCMD(i, DISABLE);
 			}
 		}
 	}
 	
-	//将废液槽转到对应的泵位置
-	relCoord = pStepMotor->Abs2Rel(AbsCoordinate[8]); //废液口位置
-	pStepMotor->RelativePosition(relCoord, AbsCoordinate[9]); //将废液槽转到废液口
+	//吸取废液
+	wasteFluidAbsorb();
 
-	//启动真空泵
+	//提示将要清洗的管道置于清洁干燥处
+	SetScreen(TIPS1PAGE_INDEX);//跳转到提示2页面
+	SetTextValue(TIPS1PAGE_INDEX, TIPS1_TIPS_EDIT, "Please place the tube that to be washed in the clean and dry place");
+	while(pProjectMan->tipsButton == TIPS_NONE);
+	pProjectMan->tipsButton = TIPS_NONE;
+	SetScreen(PURGEPAGE_INDEX);//跳转到清洗页面
 
-	//放下废液口
+	//抽干要清洗的管道
+	for(i=0;i<8;i++)
+	{
+		if(pProjectMan->purgePumpSel & (0x01<<i))
+		{
+			//将废液槽转到对应的泵位置
+			relCoord = pStepMotor->Abs2Rel(AbsCoordinate[i]);
+			pStepMotor->RelativePosition(relCoord, AbsCoordinate[9]); //AbsCoordinate[8]为3号槽（即废液槽）
 
-	//延时一小段时间
+			pDCMotor->SetSpeed(i, 10);
+			pDCMotor->SetCMD(i, ENABLE);			
+			os_wait(K_TMO, 6000, 0);
+			os_wait(K_TMO, 6000, 0);
+			os_wait(K_TMO, 6000, 0);
+			pDCMotor->SetCMD(i, DISABLE);
+		}
+	}
 
-	//提起废液口
+	//吸取废液
+	wasteFluidAbsorb();
 
-	//将废液槽转到收动点
+	//将废液槽转到手动点
 	relCoord = pStepMotor->Abs2Rel(AbsCoordinate[9]); //手动点位置
-	pStepMotor->RelativePosition(relCoord, AbsCoordinate[9]); //将废液槽转到收动点
+	pStepMotor->RelativePosition(relCoord, AbsCoordinate[9]); //将废液槽转到手动点
 
 	//提示取走废液槽
 	SetScreen(TIPS1PAGE_INDEX);//跳转到提示2页面

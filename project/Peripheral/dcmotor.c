@@ -199,27 +199,27 @@ static void DCMotor_WastePump_SetPos(Position_TypeDef pos)
 		pSensor->SetCheckEdge(RASINGEDGE);
 
 		pDCMotor->SetPos(1);
-		pDCMotor->SetSpeed(DCMOTOR10, 100-30);
-		//pDCMotor->SetSpeed(DCMOTOR10, 100); //CW方向时，100表示不转，0为最大速度
-		pDCMotor->SetDir(DCMOTOR10, CW);
-		pDCMotor->SetCMD(DCMOTOR10, ENABLE);
+		pDCMotor->SetSpeed(PUMP_WASTE, 100-30);
+		//pDCMotor->SetSpeed(PUMP_WASTE, 100); //CW方向时，100表示不转，0为最大速度
+		pDCMotor->SetDir(PUMP_WASTE, CW);
+		pDCMotor->SetCMD(PUMP_WASTE, ENABLE);
 
 		while(!pDCMotor->IsOnPos())
 		{
 			if(pSensor->GetStatus(SENSOR_UP))
 				pDCMotor->UpdatePos();	
 		}
-		pDCMotor->SetCMD(DCMOTOR10, DISABLE);		
+		pDCMotor->SetCMD(PUMP_WASTE, DISABLE);		
 	}
 	else
 	{
 		pSensor->SetCheckEdge(RASINGEDGE);
 	
 		pDCMotor->SetPos(1);
-		pDCMotor->SetSpeed(DCMOTOR10, 30);
-		//pDCMotor->SetSpeed(DCMOTOR10, 100);  //CCW方向时，0表示不转，100为最大速度
-		pDCMotor->SetDir(DCMOTOR10, CCW);
-		pDCMotor->SetCMD(DCMOTOR10, ENABLE);
+		pDCMotor->SetSpeed(PUMP_WASTE, 30);
+		//pDCMotor->SetSpeed(PUMP_WASTE, 100);  //CCW方向时，0表示不转，100为最大速度
+		pDCMotor->SetDir(PUMP_WASTE, CCW);
+		pDCMotor->SetCMD(PUMP_WASTE, ENABLE);
 
 		while(!pDCMotor->IsOnPos())
 		{
@@ -227,8 +227,8 @@ static void DCMotor_WastePump_SetPos(Position_TypeDef pos)
 				pDCMotor->UpdatePos();	
 		}
 
-		pDCMotor->SetCMD(DCMOTOR10, DISABLE);
-		pDCMotor->SetDir(DCMOTOR10, CW);//废液泵电机停止的时候要拉高方向引脚		
+		pDCMotor->SetCMD(PUMP_WASTE, DISABLE);
+		pDCMotor->SetDir(PUMP_WASTE, CW);//废液泵电机停止的时候要拉高方向引脚		
 	}
 }
 
@@ -252,7 +252,7 @@ void DCMotor_Init(void)
 	{
 		pDCMotor->SetCMD(i, DISABLE); //停止所有電機
 	}
-	pDCMotor->SetDir(DCMOTOR10, CW); //废液泵电机停止的时候要拉高方向引脚
+	pDCMotor->SetDir(PUMP_WASTE, CW); //废液泵电机停止的时候要拉高方向引脚
 
 	P_SW2 |= 0x80;  				//使能访问XSFR
 	PWMCFG = 0x00;                  //配置PWM的输出初始电平为低电平

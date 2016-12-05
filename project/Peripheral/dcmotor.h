@@ -30,6 +30,9 @@ sbit MOT10_DIR = P3^6;
 
 #define DCMOTOR_COUNT 12   //直流电机数量
 
+#define PUMP_VACUUM DCMOTOR9   //真空泵
+#define PUMP_WASTE  DCMOTOR10  //废液泵
+
 typedef enum
 {
 	UP = 0,
