@@ -96,7 +96,7 @@ typedef struct
 	Tips_TypeDef tips;//提示
 	Voice_TypeDef voice;//声音
 	float addAmount;//加注量
-	uint8 imbiAmout;//吸液量
+	uint8 imbiAmount;//吸液量
 	ShakeSpeed_TypeDef shakeSpeed;//摇动速度
 	ShakeTime_TypeDef shakeTime;//摇动时间
 	uint8 loopTime;//循环次数

@@ -60,7 +60,7 @@ void projectEditPageButtonProcess(uint16 control_id, uint8  state)
 				SetTextValue(ACTIONPAGE_INDEX, ACTEDIT_TIPSSEL_EDIT, actionTipsMenuText[pProjectMan->pCurEditAction->tips]);
 				SetTextValue(ACTIONPAGE_INDEX, ACTEDIT_VOICESEL_EDIT, actionVoiceMenuText[pProjectMan->pCurEditAction->voice]);
 				SetTextValueFloat(ACTIONPAGE_INDEX, ACTEDIT_ADDAMOUNT_EDIT, pProjectMan->pCurEditAction->addAmount);
-				SetTextValueInt32(ACTIONPAGE_INDEX, ACTEDIT_IMBIAMOUNT_EDIT, pProjectMan->pCurEditAction->imbiAmout);
+				SetTextValueInt32(ACTIONPAGE_INDEX, ACTEDIT_IMBIAMOUNT_EDIT, pProjectMan->pCurEditAction->imbiAmount);
 				SetTextValue(ACTIONPAGE_INDEX, ACTEDIT_SPEEDSEL_EDIT, actionSpeedMenuText[pProjectMan->pCurEditAction->shakeSpeed]);
 				SetTextValueInt32(ACTIONPAGE_INDEX, ACTEDIT_TIMEHOUR_EDIT, pProjectMan->pCurEditAction->shakeTime.hour);
 				SetTextValueInt32(ACTIONPAGE_INDEX, ACTEDIT_TIMEMIN_EDIT, pProjectMan->pCurEditAction->shakeTime.minute);
@@ -70,7 +70,7 @@ void projectEditPageButtonProcess(uint16 control_id, uint8  state)
 				pProjectMan->tips = pProjectMan->pCurEditAction->tips;
 				pProjectMan->voice = pProjectMan->pCurEditAction->voice;
 				pProjectMan->addAmount = pProjectMan->pCurEditAction->addAmount;
-				pProjectMan->imbiAmout = pProjectMan->pCurEditAction->imbiAmout;
+				pProjectMan->imbiAmount = pProjectMan->pCurEditAction->imbiAmount;
 				pProjectMan->shakeSpeed = pProjectMan->pCurEditAction->shakeSpeed;
 				pProjectMan->shakeTime.hour = pProjectMan->pCurEditAction->shakeTime.hour;
 				pProjectMan->shakeTime.minute = pProjectMan->pCurEditAction->shakeTime.minute;

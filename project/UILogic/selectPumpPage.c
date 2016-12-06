@@ -52,10 +52,12 @@ void selectPumpPageButtonProcess(uint16 control_id, uint8  state)
 		break;
 	case PUMPSEL_OK_BUTTON:
 		{
-			pProjectMan->proStatus = PROJECTSTATUS_FILLING;//×ªµ½¹à×¢×´Ì¬
+//			pProjectMan->proStatus = PROJECTSTATUS_FILLING;//×ªµ½¹à×¢×´Ì¬
+//
+//			SetScreen(RUNNINGPAGE_INDEX);
+//			SetTextValue(RUNNINGPAGE_INDEX, RUNNING_STATUS_EDIT, "Filling the tube");
 
-			SetScreen(RUNNINGPAGE_INDEX);
-			SetTextValue(RUNNINGPAGE_INDEX, RUNNING_STATUS_EDIT, "Filling the tube");
+			pProjectMan->tipsButton = TIPS_OK;
 		}
 		break;
 		default:

@@ -14,6 +14,6 @@ sbit DRV_BEEP = P4^3;
 sbit DRV_DELAY = P4^2;
 
 void IO_Init(void);
-void beepAlarm(unsigned char mode);
+void beepAlarm(unsigned char time);
 
 #endif

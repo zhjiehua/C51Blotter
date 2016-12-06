@@ -52,16 +52,16 @@ void projectPageButtonProcess(uint16 control_id, uint8  state)
 
 			pProjectMan->pCurRunningProject = pProjectMan->pCurProject;
 			pProjectMan->pCurRunningAction = &pProjectMan->pCurRunningProject->action[0];
-			pProjectMan->runningType = RUNNING_PROJECT;
+			pProjectMan->runningType = RUNNING_PROJECT; //同步工作线程
 
-			SetScreen(TIPS2PAGE_INDEX);//跳转到提示2页面
-			SetTextValue(TIPS2PAGE_INDEX, TIPS2_TIPS_EDIT, FILLTUBE_TIPS);
-			pProjectMan->tipsSource = TIPSSOURCE_FILLTIPS;
-			
-			pProjectMan->proStatus = PROJECTSTATUS_WAITING;
-			pProjectMan->preProStatus = pProjectMan->proStatus;
+//			SetScreen(TIPS2PAGE_INDEX);//跳转到提示2页面
+//			SetTextValue(TIPS2PAGE_INDEX, TIPS2_TIPS_EDIT, FILLTUBE_TIPS);
+//			pProjectMan->tipsSource = TIPSSOURCE_FILLTIPS;
+//			
+//			pProjectMan->proStatus = PROJECTSTATUS_WAITING;
+//			pProjectMan->preProStatus = pProjectMan->proStatus;
 
-			cDebug("running project\n");
+			cDebug("========projectPage start to run the PROJECT program\n");
 		}
 		break;
 		case PRO_BACK_BUTTON:

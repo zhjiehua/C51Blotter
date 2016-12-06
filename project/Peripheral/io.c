@@ -64,24 +64,15 @@ void IO_Init(void)
  * 参数：mode: 0:一直响
  *		 	   1:鸣叫5声
  */
-void beepAlarm(unsigned char mode)
+void beepAlarm(unsigned char time)
 {
-	unsigned char i;
-	switch(mode)
+	if(time == 0)
+		DRV_BEEP = 1;  //一直响
+	else
 	{
-		case 0:
-			DRV_BEEP = 1;
-			break;
-		case 1:
-			for(i=0;i<5;i++)
-			{
-				DRV_BEEP = 1;
-				os_wait(K_TMO, 100, 0);  //等待100个时钟滴答(ticks),即1s
-				DRV_BEEP = 0;
-				os_wait(K_TMO, 100, 0);  //等待100个时钟滴答(ticks),即1s
-			}
-			break;
-		default:
-			break;
+		DRV_BEEP = 1;
+		os_wait(K_TMO, 100*time, 0);  //等待100个时钟滴答(ticks),即1s
+		DRV_BEEP = 0;
+		os_wait(K_TMO, 100, 0);  //等待100个时钟滴答(ticks),即1s
 	}
 }

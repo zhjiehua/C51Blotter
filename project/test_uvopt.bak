@@ -127,7 +127,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>DLGDP51</Key>
-          <Name>(98=-1,-1,-1,-1,0)(82=-1,-1,-1,-1,0)(83=-1,-1,-1,-1,0)(84=-1,-1,-1,-1,0)(85=-1,-1,-1,-1,0)(99=-1202,215,-999,503,1)(91=-1,-1,-1,-1,0)(92=-1,-1,-1,-1,0)(5067=-1,-1,-1,-1,0)</Name>
+          <Name>(98=-1,-1,-1,-1,0)(82=-1,-1,-1,-1,0)(83=-1,-1,-1,-1,0)(84=-1,-1,-1,-1,0)(85=-1,-1,-1,-1,0)(99=0,215,203,503,0)(91=-1,-1,-1,-1,0)(92=-1,-1,-1,-1,0)(5067=-1,-1,-1,-1,0)</Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
       <WatchWindow1>
@@ -135,6 +135,11 @@
           <count>0</count>
           <WinNumber>1</WinNumber>
           <ItemText>project</ItemText>
+        </Ww>
+        <Ww>
+          <count>1</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>pProjectMan-&gt;runningType</ItemText>
         </Ww>
       </WatchWindow1>
       <DebugFlag>
@@ -170,7 +175,7 @@
 
   <Group>
     <GroupName>Source Group 1</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
@@ -179,7 +184,7 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>19</ColumnNumber>
+      <ColumnNumber>13</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
@@ -193,7 +198,7 @@
       <FileType>2</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>18</ColumnNumber>
+      <ColumnNumber>28</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
@@ -219,7 +224,7 @@
 
   <Group>
     <GroupName>HMI</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
@@ -228,7 +233,7 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>6</ColumnNumber>
+      <ColumnNumber>16</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
@@ -256,7 +261,7 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>19</ColumnNumber>
+      <ColumnNumber>5</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
@@ -282,7 +287,7 @@
 
   <Group>
     <GroupName>UILogic</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <File>
@@ -333,7 +338,7 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>29</ColumnNumber>
+      <ColumnNumber>48</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
@@ -347,10 +352,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>8</ColumnNumber>
+      <ColumnNumber>12</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>203</TopLine>
+      <CurrentLine>217</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\UILogic\managerment.c</PathWithFileName>
       <FilenameWithoutPath>managerment.c</FilenameWithoutPath>
@@ -375,10 +380,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>21</ColumnNumber>
+      <ColumnNumber>45</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>488</TopLine>
+      <CurrentLine>493</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\UILogic\project.c</PathWithFileName>
       <FilenameWithoutPath>project.c</FilenameWithoutPath>
@@ -389,7 +394,7 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>0</ColumnNumber>
+      <ColumnNumber>21</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
@@ -403,7 +408,7 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>3</ColumnNumber>
+      <ColumnNumber>26</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
@@ -417,10 +422,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>26</ColumnNumber>
+      <ColumnNumber>38</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>91</TopLine>
-      <CurrentLine>100</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\UILogic\purgePage.c</PathWithFileName>
       <FilenameWithoutPath>purgePage.c</FilenameWithoutPath>
@@ -431,7 +436,7 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>53</ColumnNumber>
+      <ColumnNumber>24</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
@@ -494,10 +499,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>19</ColumnNumber>
+      <ColumnNumber>33</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>0</TopLine>
-      <CurrentLine>0</CurrentLine>
+      <TopLine>63</TopLine>
+      <CurrentLine>67</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\Peripheral\io.c</PathWithFileName>
       <FilenameWithoutPath>io.c</FilenameWithoutPath>
@@ -508,10 +513,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>18</ColumnNumber>
+      <ColumnNumber>23</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>109</TopLine>
-      <CurrentLine>116</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\Peripheral\uart.c</PathWithFileName>
       <FilenameWithoutPath>uart.c</FilenameWithoutPath>
@@ -522,10 +527,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>55</ColumnNumber>
+      <ColumnNumber>14</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>115</TopLine>
-      <CurrentLine>115</CurrentLine>
+      <TopLine>25</TopLine>
+      <CurrentLine>25</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\Peripheral\stepmotor.c</PathWithFileName>
       <FilenameWithoutPath>stepmotor.c</FilenameWithoutPath>
@@ -536,10 +541,10 @@
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
-      <ColumnNumber>36</ColumnNumber>
+      <ColumnNumber>102</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>73</TopLine>
-      <CurrentLine>73</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\Peripheral\dcmotor.c</PathWithFileName>
       <FilenameWithoutPath>dcmotor.c</FilenameWithoutPath>
@@ -552,8 +557,8 @@
       <Focus>0</Focus>
       <ColumnNumber>1</ColumnNumber>
       <tvExpOptDlg>0</tvExpOptDlg>
-      <TopLine>59</TopLine>
-      <CurrentLine>59</CurrentLine>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
       <PathWithFileName>.\Peripheral\sensor.c</PathWithFileName>
       <FilenameWithoutPath>sensor.c</FilenameWithoutPath>
@@ -562,8 +567,8 @@
 
   <AlienFiles>
     <PathWithFilename>G:\GitHubRepository\C51Blotter\project\PERIPHERAL\STEPMOTOR.H</PathWithFilename>
-    <TopLine>104</TopLine>
-    <CurrentLine>116</CurrentLine>
+    <TopLine>101</TopLine>
+    <CurrentLine>108</CurrentLine>
     <Constant>0</Constant>
     <WindowPosition>
       <length>0</length>
@@ -587,9 +592,9 @@
   </AlienFiles>
 
   <AlienFiles>
-    <PathWithFilename>G:\GitHubRepository\C51Blotter\project\Peripheral\common.h</PathWithFilename>
+    <PathWithFilename>G:\GITHUBREPOSITORY\C51BLOTTER\PROJECT\UILOGIC\PAGECOMMON.H</PathWithFilename>
     <TopLine>17</TopLine>
-    <CurrentLine>33</CurrentLine>
+    <CurrentLine>18</CurrentLine>
     <Constant>0</Constant>
     <WindowPosition>
       <length>0</length>
@@ -613,9 +618,9 @@
   </AlienFiles>
 
   <AlienFiles>
-    <PathWithFilename>G:\GitHubRepository\C51Blotter\project\Peripheral\sensor.h</PathWithFilename>
-    <TopLine>28</TopLine>
-    <CurrentLine>34</CurrentLine>
+    <PathWithFilename>G:\GitHubRepository\C51Blotter\project\Peripheral\io.h</PathWithFilename>
+    <TopLine>1</TopLine>
+    <CurrentLine>17</CurrentLine>
     <Constant>0</Constant>
     <WindowPosition>
       <length>0</length>
@@ -639,9 +644,35 @@
   </AlienFiles>
 
   <AlienFiles>
-    <PathWithFilename>G:\GitHubRepository\C51Blotter\project\PERIPHERAL\DCMOTOR.H</PathWithFilename>
-    <TopLine>57</TopLine>
-    <CurrentLine>66</CurrentLine>
+    <PathWithFilename>G:\GitHubRepository\C51Blotter\project\UILogic\managerment.h</PathWithFilename>
+    <TopLine>68</TopLine>
+    <CurrentLine>72</CurrentLine>
+    <Constant>0</Constant>
+    <WindowPosition>
+      <length>0</length>
+      <flags>0</flags>
+      <showCmd>0</showCmd>
+      <MinPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MinPosition>
+      <MaxPosition>
+        <xPos>0</xPos>
+        <yPos>0</yPos>
+      </MaxPosition>
+      <NormalPosition>
+        <Top>0</Top>
+        <Left>0</Left>
+        <Right>0</Right>
+        <Bottom>0</Bottom>
+      </NormalPosition>
+    </WindowPosition>
+  </AlienFiles>
+
+  <AlienFiles>
+    <PathWithFilename>G:\GITHUBREPOSITORY\C51BLOTTER\PROJECT\UILOGIC\PROJECT.H</PathWithFilename>
+    <TopLine>54</TopLine>
+    <CurrentLine>64</CurrentLine>
     <Constant>0</Constant>
     <WindowPosition>
       <length>0</length>
@@ -2005,61 +2036,61 @@
     <ActiveMDIGroup>0</ActiveMDIGroup>
     <MDIGroup>
       <Size>100</Size>
-      <ActiveTab>2</ActiveTab>
+      <ActiveTab>3</ActiveTab>
       <Documents>
         <Doc>
-          <Name>./PERIPHERAL/SENSOR.H</Name>
-          <ColumnNumber>27</ColumnNumber>
-          <TopLine>28</TopLine>
-          <CurrentLine>34</CurrentLine>
+          <Name>.\UILogic\managerment.c</Name>
+          <ColumnNumber>12</ColumnNumber>
+          <TopLine>203</TopLine>
+          <CurrentLine>217</CurrentLine>
         </Doc>
         <Doc>
           <Name>./PERIPHERAL/STEPMOTOR.H</Name>
-          <ColumnNumber>19</ColumnNumber>
-          <TopLine>104</TopLine>
-          <CurrentLine>116</CurrentLine>
+          <ColumnNumber>14</ColumnNumber>
+          <TopLine>101</TopLine>
+          <CurrentLine>108</CurrentLine>
         </Doc>
         <Doc>
           <Name>.\Peripheral\stepmotor.c</Name>
           <ColumnNumber>14</ColumnNumber>
-          <TopLine>118</TopLine>
-          <CurrentLine>132</CurrentLine>
+          <TopLine>25</TopLine>
+          <CurrentLine>25</CurrentLine>
         </Doc>
         <Doc>
-          <Name>.\UILogic\purgePage.c</Name>
-          <ColumnNumber>26</ColumnNumber>
-          <TopLine>91</TopLine>
-          <CurrentLine>100</CurrentLine>
+          <Name>.\UILogic\project.c</Name>
+          <ColumnNumber>49</ColumnNumber>
+          <TopLine>488</TopLine>
+          <CurrentLine>496</CurrentLine>
         </Doc>
         <Doc>
-          <Name>.\Peripheral\sensor.c</Name>
-          <ColumnNumber>1</ColumnNumber>
-          <TopLine>59</TopLine>
-          <CurrentLine>59</CurrentLine>
-        </Doc>
-        <Doc>
-          <Name>.\Peripheral\dcmotor.c</Name>
-          <ColumnNumber>36</ColumnNumber>
-          <TopLine>73</TopLine>
-          <CurrentLine>73</CurrentLine>
-        </Doc>
-        <Doc>
-          <Name>./PERIPHERAL/DCMOTOR.H</Name>
-          <ColumnNumber>0</ColumnNumber>
-          <TopLine>57</TopLine>
-          <CurrentLine>66</CurrentLine>
-        </Doc>
-        <Doc>
-          <Name>.\Peripheral\uart.c</Name>
-          <ColumnNumber>18</ColumnNumber>
-          <TopLine>109</TopLine>
-          <CurrentLine>116</CurrentLine>
-        </Doc>
-        <Doc>
-          <Name>./PERIPHERAL/COMMON.H</Name>
-          <ColumnNumber>3</ColumnNumber>
+          <Name>\GITHUBREPOSITORY\C51BLOTTER\PROJECT\UILOGIC\PAGECOMMON.H</Name>
+          <ColumnNumber>25</ColumnNumber>
           <TopLine>17</TopLine>
-          <CurrentLine>33</CurrentLine>
+          <CurrentLine>18</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>.\Peripheral\io.c</Name>
+          <ColumnNumber>33</ColumnNumber>
+          <TopLine>63</TopLine>
+          <CurrentLine>67</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>./PERIPHERAL/IO.H</Name>
+          <ColumnNumber>33</ColumnNumber>
+          <TopLine>1</TopLine>
+          <CurrentLine>17</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>./UILOGIC/MANAGERMENT.H</Name>
+          <ColumnNumber>10</ColumnNumber>
+          <TopLine>68</TopLine>
+          <CurrentLine>72</CurrentLine>
+        </Doc>
+        <Doc>
+          <Name>\GITHUBREPOSITORY\C51BLOTTER\PROJECT\UILOGIC\PROJECT.H</Name>
+          <ColumnNumber>20</ColumnNumber>
+          <TopLine>54</TopLine>
+          <CurrentLine>64</CurrentLine>
         </Doc>
       </Documents>
     </MDIGroup>

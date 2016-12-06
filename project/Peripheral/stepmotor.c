@@ -4,8 +4,6 @@
 #include "sensor.h"
 #include "stdlib.h"
 
-#define TANK_COUNT 50
-
 static StepMotor_TypeDef stepMotor;
 StepMotor_TypeDef *pStepMotor = &stepMotor;
 
@@ -270,8 +268,8 @@ static void StepMotor_RelativePosition(uint8_t desTank, uint8_t srcTank)
 	uint8_t dis;
 	Direction_TypeDef dir;
 
-	len = desTank - srcTank;
-	//len = srcTank - desTank;
+	len = desTank - srcTank;  //反转为主
+	//len = srcTank - desTank;	//正转为主
 
 	if(len == 0)
 		return;
@@ -323,6 +321,7 @@ static void StepMotor_RelativePosition(uint8_t desTank, uint8_t srcTank)
 //步进电机初始化
 void StepMotor_Init(void)
 {
+	pStepMotor->offset = 450;
 	pStepMotor->speedStatus = SPEED_NONE;
 	pStepMotor->pSpeedLevel = speedLevel;
 	pStepMotor->curSpeedIndex = 0;
@@ -374,62 +373,73 @@ void tm1_isr() interrupt 3 using 3
 {
 	static uint16_t cnt = 0;
 
-	if(pStepMotor->speedStatus == SPEED_ACC) //加速
-	{
-		cnt++;
-		if(cnt >= pStepMotor->pSpeedLevel[pStepMotor->curSpeedIndex].speedConst)
+	switch(pStepMotor->speedStatus)
+	{				  
+		case SPEED_ACC: //加速
 		{
-			cnt = 0;
-			pStepMotor->curSpeedIndex++;
-
-			//Uart_SendData(0x01);
+			cnt++;
+			if(cnt >= pStepMotor->pSpeedLevel[pStepMotor->curSpeedIndex].speedConst)
+			{
+				cnt = 0;
+				pStepMotor->curSpeedIndex++;
+	
+				//Uart_SendData(0x01);
+			}
+	
+			if(pStepMotor->curSpeedIndex >= pStepMotor->desSpeedIndex) //加速完成
+			{
+				pStepMotor->curSpeedIndex = pStepMotor->desSpeedIndex;
+				pStepMotor->speedStatus = SPEED_NONE;
+			}		
 		}
-
-		if(pStepMotor->curSpeedIndex >= pStepMotor->desSpeedIndex) //加速完成
+		break;
+		case SPEED_DEC: //减速
 		{
-			pStepMotor->curSpeedIndex = pStepMotor->desSpeedIndex;
-			pStepMotor->speedStatus = SPEED_NONE;
-		}		
-	}
-	else if(pStepMotor->speedStatus == SPEED_DEC)//减速
-	{
-		cnt++;
-		if(cnt >= pStepMotor->pSpeedLevel[pStepMotor->curSpeedIndex].speedConst)
-		{
-			cnt = 0;
-			pStepMotor->curSpeedIndex--;
-
-			//Uart_SendData(0x02);
+			cnt++;
+			if(cnt >= pStepMotor->pSpeedLevel[pStepMotor->curSpeedIndex].speedConst)
+			{
+				cnt = 0;
+				pStepMotor->curSpeedIndex--;
+	
+				//Uart_SendData(0x02);
+			}
+	
+			if(pStepMotor->curSpeedIndex <= 0)  //减速到最小速度
+			{
+				pStepMotor->curSpeedIndex = 0;
+				pStepMotor->speedStatus = SPEED_NONE;
+				
+				cnt = 0;
+				//TR1 = 0;  //停止定时器1
+			}
 		}
-
-		if(pStepMotor->curSpeedIndex <= 0)  //减速到最小速度
+		break;
+		case SPEED_STOP: 
 		{
 			pStepMotor->curSpeedIndex = 0;
-			pStepMotor->speedStatus = SPEED_NONE;
-			
+			pStepMotor->speedStatus = SPEED_POSOFFSET;
+	
 			cnt = 0;
 			//TR1 = 0;  //停止定时器1
+	
+			//TF1 = 0;
+			//Uart_SendData(0x03);
 		}
-	}
-	else if(pStepMotor->speedStatus == SPEED_STOP)
-	{
-		pStepMotor->curSpeedIndex = 0;
-		pStepMotor->speedStatus = SPEED_POSOFFSET;
-
-		cnt = 0;
-		//TR1 = 0;  //停止定时器1
-
-		//TF1 = 0;
-		//Uart_SendData(0x03);
-	}
-	else if(pStepMotor->speedStatus == SPEED_POSOFFSET)
-	{
-		if(cnt++ >= 450)
+		break;
+		case SPEED_POSOFFSET:
 		{
-			pStepMotor->speedStatus = SPEED_NONE;
-			TR1 = 0;  //停止定时器1
-			cnt = 0;	
+			if(cnt++ >= pStepMotor->offset)
+			{
+				pStepMotor->speedStatus = SPEED_NONE;
+				TR1 = 0;  //停止定时器1
+				cnt = 0;	
+			}
 		}
+		break;
+		case SPEED_NONE:
+		break;
+		default:
+		break;
 	}
 
 	//更新定时器

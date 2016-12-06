@@ -36,6 +36,7 @@ void runningPageButtonProcess(uint16 control_id, uint8  state)
 
 void runningPageRTCTimeoutProcess(uint16 control_id)
 {
+	pProjectMan->RTCTimeout = 1;
 	cDebug("========runningPage RTC timeout!\n");
 }
 

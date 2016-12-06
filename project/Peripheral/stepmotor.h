@@ -25,6 +25,9 @@ sbit S_STEP2 = P3^4;
 
 #define SPEED_CONST  600 //用于加减速的步进时间常数
 
+#define TANK_COUNT 50
+#define TANK_PER_PLATE 5
+
 /*单片机定时器1工作于12T模式时*/
 //#define F0R1 (65536-FOSC/2/12/(STEPMOTOR_PULSEPERROUND*0.1))
 //#define F0R2 (65536-FOSC/2/12/(STEPMOTOR_PULSEPERROUND*0.2)) //正常工作速度
@@ -91,6 +94,7 @@ typedef struct
 
 	int8_t curPos;  //当前位置，如果是顺时针旋转就++，否则--
 	//int8_t desPos;  //目标位置
+	uint16_t offset;  //位置偏移，用于校正转盘，默认450
 
 	Direction_TypeDef direction;  //记录方向
 

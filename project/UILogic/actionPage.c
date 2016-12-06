@@ -12,12 +12,12 @@ void actionPageButtonProcess(uint16 control_id, uint8  state)
 	{
 		case ACTEDIT_SAVE_BUTTON:
 		{
-			//保存校准参数
+			//保存动作参数
 			pProjectMan->pCurEditAction->pump = pProjectMan->pump;
 			pProjectMan->pCurEditAction->tips = pProjectMan->tips;
 			pProjectMan->pCurEditAction->voice = pProjectMan->voice;
 			pProjectMan->pCurEditAction->addAmount = pProjectMan->addAmount;
-			pProjectMan->pCurEditAction->imbiAmout = pProjectMan->imbiAmout;
+			pProjectMan->pCurEditAction->imbiAmount = pProjectMan->imbiAmount;
 			pProjectMan->pCurEditAction->shakeSpeed = pProjectMan->shakeSpeed;
 			pProjectMan->pCurEditAction->shakeTime.hour = pProjectMan->shakeTime.hour;
 			pProjectMan->pCurEditAction->shakeTime.minute = pProjectMan->shakeTime.minute;
@@ -46,10 +46,13 @@ void actionPageEditProcess(uint16 control_id, uint8 *str)
 	switch(control_id)
 	{
 		case ACTEDIT_ADDAMOUNT_EDIT:
-			pProjectMan->addAmount = StringToFloat(str);
+			if(pProjectMan->pump == 8)//0，无泵
+				SetTextValueFloat(ACTIONPAGE_INDEX, ACTEDIT_ADDAMOUNT_EDIT, 0.0);
+			else
+				pProjectMan->addAmount = StringToFloat(str);
 		break;
 		case ACTEDIT_IMBIAMOUNT_EDIT:
-			pProjectMan->imbiAmout = StringToInt32(str);
+			pProjectMan->imbiAmount = StringToInt32(str);
 			break;
 		case ACTEDIT_TIMEHOUR_EDIT:
 			pProjectMan->shakeTime.hour = StringToInt32(str);
@@ -73,6 +76,11 @@ void actionPageMenuProcess(uint16 control_id, uint8 item)
 	case ACTEDIT_PUMPSEL_MENU:
 		{
 			pProjectMan->pump = item;
+			if(item == 8) //0，无泵
+			{
+				pProjectMan->addAmount = 0;
+				SetTextValueFloat(ACTIONPAGE_INDEX, ACTEDIT_ADDAMOUNT_EDIT, 0.0);
+			}	
 		}
 		break;
 	case ACTEDIT_TIPSSEL_MENU:

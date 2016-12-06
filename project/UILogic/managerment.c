@@ -214,106 +214,15 @@ void loopForever(void)
 		break;
 	case RUNNING_PROJECT: //项目运行中
 	{
-		switch(pProjectMan->proStatus)
-		{
-		case PROJECTSTATUS_FILLING:  //灌注管道中
-		{
-			static uint32 cnt = 0;
-			//执行灌注管道命令
-			if(cnt == 0)
-				cDebug("======== FILLING program!\n");
-			if(cnt++ >= 4294967)
-			{
-				cnt = 0;
-				pProjectMan->proStatus = PROJECTSTATUS_PLACEPLATE;
-			}
-		}
-		break;
-		case PROJECTSTATUS_PLACEPLATE:  //放置槽板
-		{
-			static uint32 cnt = 0;
-			//执行放置槽板命令
-			if(cnt == 0)
-				cDebug("======== PLACEPLATE program!\n");
-			if(cnt++ >= 1000)
-			{
-				cnt = 0;
-				pProjectMan->proStatus = PROJECTSTATUS_IMBIBING;
-			}
-		}
-			break;
-		case PROJECTSTATUS_IMBIBING:  //吸液
-		{
-			static uint32 cnt = 0;
-			//执行吸液命令
-			if(cnt == 0)
-				cDebug("======== IMBIBING program!\n");
-			if(cnt++ >= 1000)
-			{
-				cnt = 0;
-				pProjectMan->proStatus = PROJECTSTATUS_TIPS;
-			}
-		}
-			break;
-		case PROJECTSTATUS_TIPS:  //提示
-		{
-			static uint32 cnt = 0;
-			//执行提示命令
-			if(cnt == 0)
-				cDebug("======== TIPS program!\n");
-			if(cnt++ >= 1000)
-			{
-				cnt = 0;
-				pProjectMan->proStatus = PROJECTSTATUS_ADDING;
-			}
-		}
-			break;
-		case PROJECTSTATUS_ADDING:  //注液
-		{
-			static uint32 cnt = 0;
-			//执行注液命令
-			if(cnt == 0)
-				cDebug("======== ADDING program!\n");
-			if(cnt++ >= 1000)
-			{
-				cnt = 0;
-				pProjectMan->proStatus = PROJECTSTATUS_INCUBATION;
-			}
-		}
-			break;
-		case PROJECTSTATUS_INCUBATION:  //孵育
-		{
-			static uint32 cnt = 0;
-			//执行孵育命令
-			if(cnt == 0)
-			{
-				//启动RTC
-
-				cDebug("======== INCUBATION program!\n");
-			}
-			if(cnt++ >= 1000)
-			{
-				cnt = 0;
-				pProjectMan->proStatus = PROJECTSTATUS_TIMEOUT;
-			}
-		}
-			break;
-		case PROJECTSTATUS_TIMEOUT:
-
-			break;
-		case PROJECTSTATUS_PAUSE:
-			break;
-		case PROJECTSTATUS_WAITING:
-			break;
-		default:
-			break;
-		}
+		projectProgram();
+		pProjectMan->runningType = RUNNING_NONE;
 	}
 	break;
 	case RUNNING_BACKFLOW:
 		break;
 	case RUNNING_PURGE:	 //执行清洗程序
-		purgeProgram();	
+		purgeProgram();
+		pProjectMan->runningType = RUNNING_NONE;  //程序执行完成要清除标志	
 		break;
 	case RUNNING_CALIBRATION:
 		break;
