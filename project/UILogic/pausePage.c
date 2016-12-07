@@ -32,15 +32,17 @@ void pausePageButtonProcess(uint16 control_id, uint8  state)
 		break;
 	case PAUSE_JUMPTO_BUTTON:
 		pProjectMan->pCurRunningAction = pProjectMan->pCurJumptoAction;
-		pProjectMan->proStatus = PROJECTSTATUS_IMBIBING;
+		pProjectMan->jumpTo = 1;
+		pProjectMan->exception = EXCEPTION_NONE;
 		SetScreen(RUNNINGPAGE_INDEX);
 		cDebug("========pausePage JUMPTO program!\n");
 		break;
 	case PAUSE_ROTATE_BUTTON:
+		pProjectMan->rotateFlag = 1;
 		cDebug("========pausePage ROTATE program!\n");
 		break;
 	case PAUSE_RESUME_BUTTON:
-		pProjectMan->proStatus = pProjectMan->preProStatus;
+		pProjectMan->exception = EXCEPTION_NONE;
 		SetScreen(RUNNINGPAGE_INDEX);
 		cDebug("========pausePage RESUME program!\n");
 		break;

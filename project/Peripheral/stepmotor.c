@@ -65,6 +65,11 @@ const SpeedLevel_TypeDef speedLevel[] = {
 	{STEPMOTOR_FREQ(0.7), 0.7*SPEED_CONST},
 	{STEPMOTOR_FREQ(0.9), 0.9*SPEED_CONST},
 	{STEPMOTOR_FREQ(1.0), 1.0*SPEED_CONST},
+	{STEPMOTOR_FREQ(1.2), 1.2*SPEED_CONST},
+	{STEPMOTOR_FREQ(1.4), 1.4*SPEED_CONST},
+	{STEPMOTOR_FREQ(1.6), 1.6*SPEED_CONST},
+	{STEPMOTOR_FREQ(1.8), 1.8*SPEED_CONST},
+	{STEPMOTOR_FREQ(2.0), 2.0*SPEED_CONST},
 };
 
 const uint8_t speedLevelSize = (sizeof(speedLevel)/sizeof(speedLevel[0]));

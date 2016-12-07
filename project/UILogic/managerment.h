@@ -38,6 +38,13 @@ typedef enum
 
 typedef enum
 {
+	EXCEPTION_NONE,
+	EXCEPTION_PAUSE,
+	EXCEPTION_STOP,
+}Exception_TypeDef;
+
+typedef enum
+{
 	RUNNING_NONE,
 	RUNNING_PROJECT,
 	RUNNING_BACKFLOW,
@@ -101,12 +108,17 @@ typedef struct
 	ShakeTime_TypeDef shakeTime;//摇动时间
 	uint8 loopTime;//循环次数
 
-	TipsSource_TypeDef tipsSource;  //跳出提示页面的源头
+	Exception_TypeDef exception;  //异常
+	Exception_TypeDef exceptionButtonFlag;  //当暂停或停止按钮按下时该标志位设置为PAUSE/STOP，如果在弹出的对话框中点击了OK才设置exception为PAUSE/STOP
+
+	uint8 rotateFlag;  //用于暂停页面的旋转标志
+	uint8 jumpTo;  //用于暂停页面的跳转标志
+
 	TipsButton_TypeDef tipsButton;  //提示页面的按钮状态
 	RunningType_TypeDef runningType;  //正在运行的类型
 
-	ProjectStatus_TypeDef proStatus;  //项目的动作流程
-	ProjectStatus_TypeDef preProStatus;  //项目的动作流程
+//	ProjectStatus_TypeDef proStatus;  //项目的动作流程
+//	ProjectStatus_TypeDef preProStatus;  //项目的动作流程
 }ProjectMan_TypeDef;
 
 /************************************************************************/
@@ -121,8 +133,6 @@ void initUI(void);
 
 //void uartInterrupt(uint8 data);
 void loopForever(void);
-
-void tipsPageProcess(void);
 
 #ifdef __cplusplus
 }

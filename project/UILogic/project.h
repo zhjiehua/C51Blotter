@@ -85,12 +85,12 @@ extern Project_TypeDef project[PROJECT_COUNT];
 extern float caliPumpPara[PUMP_COUNT];
 
 void initProjectStruct(Project_TypeDef* pro, char *name);
-
 void initCaliPumpPara(float para);
-
 void wasteFluidAbsorb(void);
-
 void projectProgram(void);
+void purgeProgram(void);
+void homeProgram(void);
+void calibraProgram(void);
 
 #ifdef __cplusplus
 }

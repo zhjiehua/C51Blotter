@@ -71,8 +71,8 @@ void beepAlarm(unsigned char time)
 	else
 	{
 		DRV_BEEP = 1;
-		os_wait(K_TMO, 100*time, 0);  //等待100个时钟滴答(ticks),即1s
+		os_wait(K_TMO, 50*time, 0);  //等待100个时钟滴答(ticks),即1s
 		DRV_BEEP = 0;
-		os_wait(K_TMO, 100, 0);  //等待100个时钟滴答(ticks),即1s
+		os_wait(K_TMO, 50, 0);  //等待100个时钟滴答(ticks),即1s
 	}
 }

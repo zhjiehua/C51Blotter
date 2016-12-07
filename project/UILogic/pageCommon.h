@@ -142,7 +142,7 @@ extern "C" {
 #define RUNNING_LOOPTIME_EDIT			6
 #define RUNNING_TOTALLOOPTIME_EDIT		7
 #define RUNNING_TIME_RTC				8
-#define RUNNING_PAUSERESUME_BUTTON		9
+#define RUNNING_PAUSE_BUTTON			9
 #define RUNNING_STOP_BUTTON				10
 #define RUNNING_STATUS_EDIT				11
 
@@ -244,7 +244,6 @@ void runningPageRTCTimeoutProcess(uint16 control_id);
 void backflowPageButtonProcess(uint16 control_id, uint8  state);
 
 void purgePageButtonProcess(uint16 control_id, uint8  state);
-void purgeProgram(void);
 
 void caliPageButtonProcess(uint16 control_id, uint8  state);
 void caliPageEditProcess(uint16 control_id, uint8 *str);

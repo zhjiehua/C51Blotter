@@ -15,7 +15,7 @@
 #include "stdio.h"
 
 //起始任务
-void startupTask(void) _task_ 0  
+void startupTask(void) _task_ TASK_STARTUP  
 {
 	//---------------初始化-------------------------------
 	IO_Init();
@@ -36,15 +36,15 @@ void startupTask(void) _task_ 0
 	Uart_SendData(0xA5);
 
 	//---------------创建任务-----------------------------
-	os_create_task(1); 	//创建任务1
-	os_create_task(2);	//创建任务2
+	os_create_task(TASK_UI); 	//创建任务1
+	//os_create_task(TASK_HOME);	//创建任务2   TASK_HOME
 
 	//---------------删除该任务-----------------------------
- 	os_delete_task(0);	//删除自己(task0),使task0退出任务链表
+ 	os_delete_task(TASK_STARTUP);	//删除自己(task0),使task0退出任务链表
 }  
 
 //UI任务
-void UITask(void) _task_ 1  
+void UITask(void) _task_ TASK_UI  
 {  
 	while(1)
 	{
@@ -53,8 +53,7 @@ void UITask(void) _task_ 1
 
 		//喂狗
 		WDT_CONTR = 0x3F;
-
-#if 1		
+	
 		//处理UI数据
 		size = queue_find_cmd(cmd_buffer, CMD_MAX_SIZE); //从缓冲区获取一条指令
 		if(size > 0)//接收到指令
@@ -66,9 +65,6 @@ void UITask(void) _task_ 1
 			ProcessMessage((PCTRL_MSG)cmd_buffer, size);//处理指令
 		}
 
-		tipsPageProcess();
-#endif
-
 //		P40 = 0;              
 //		os_wait(K_TMO, 100, 0);  //等待100个时钟滴答(ticks),即1s
 //					 //配置文件ConfTny.A51中INT_CLOCK EQU 10000; default is 10000 cycles
@@ -79,23 +75,56 @@ void UITask(void) _task_ 1
 }
  
 //工作任务
-void workTask(void) _task_ 2  
+void teskTask(void) _task_ TASK_TEST  
 {  
 	while(1)
 	{	
-//		LED2 = 1;              
-//		os_wait(K_TMO, 200, 0);  //等待100个时钟滴答(ticks),即1s
-//					 //配置文件ConfTny.A51中INT_CLOCK EQU 10000; default i s 10000 cycles
-//					 //意思是时钟滴答为10000个机器周期。即10000*1uS=10ms			 
-//		LED2 = 0;
-//		os_wait(K_TMO, 200, 0);
+		LED2 = 1;              
+		os_wait(K_TMO, 200, 0);  //等待100个时钟滴答(ticks),即1s
+					 //配置文件ConfTny.A51中INT_CLOCK EQU 10000; default i s 10000 cycles
+					 //意思是时钟滴答为10000个机器周期。即10000*1uS=10ms			 
+		LED2 = 0;
+		os_wait(K_TMO, 200, 0);
 
 		//步进电机驱动测试
-		//StepMotor_Test();
+		StepMotor_Test();
 
 		//直流电机驱动测试
-		//DCMotor_Test();
+		DCMotor_Test();
 
-		loopForever();
+		//loopForever();
     }  
 }  
+
+//工程任务
+void projectTask(void) _task_ TASK_PROJECT//TASK_PROJECT
+{
+	projectProgram();
+	os_delete_task(TASK_PROJECT);	//删除自己	
+}
+
+//清洗任务
+void purgeTask(void) _task_ TASK_PURGE
+{
+	purgeProgram();
+	os_delete_task(TASK_PURGE);	//删除自己	
+}
+
+//回原点任务
+void homeTask(void) _task_ TASK_HOME   //TASK_HOME
+{
+	homeProgram();
+	os_delete_task(TASK_HOME);	//删除自己
+}
+
+//校准任务
+void calibraTask(void) _task_ TASK_CALIBRA
+{
+	calibraProgram();
+	os_delete_task(TASK_CALIBRA);	//删除自己
+}
+
+void createTask(uint8_t task)
+{
+	os_create_task(task);
+}

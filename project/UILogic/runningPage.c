@@ -10,23 +10,17 @@ void runningPageButtonProcess(uint16 control_id, uint8  state)
 {
 	switch(control_id)
 	{
-	case RUNNING_PAUSERESUME_BUTTON:
+	case RUNNING_PAUSE_BUTTON:
 		SetTextValue(TIPS2PAGE_INDEX, TIPS2_TIPS_EDIT, PAUSE_TIPS);
 		SetScreen(TIPS2PAGE_INDEX);
-
-		pProjectMan->tipsSource = TIPSSOURCE_RUNNINGPAUSE;
-
-		//pProjectMan->preProStatus = pProjectMan->proStatus;
-		//pProjectMan->proStatus = PROJECTSTATUS_PAUSETIPS;
+		//pProjectMan->exception = EXCEPTION_PAUSE;
+		pProjectMan->exceptionButtonFlag = EXCEPTION_PAUSE;
 		break;
 	case RUNNING_STOP_BUTTON:
 		SetTextValue(TIPS2PAGE_INDEX, TIPS2_TIPS_EDIT, STOP_TIPS);
 		SetScreen(TIPS2PAGE_INDEX);
-
-		pProjectMan->tipsSource = TIPSSOURCE_RUNNINGSTOP;
-
-		//pProjectMan->preProStatus = pProjectMan->proStatus;
-		//pProjectMan->proStatus = PROJECTSTATUS_STOPTIPS;
+		//pProjectMan->exception = EXCEPTION_STOP;
+		pProjectMan->exceptionButtonFlag = EXCEPTION_STOP;
 		break;
 		default:
 			cDebug("runningPage BUTTON error!\n");

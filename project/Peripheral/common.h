@@ -23,6 +23,14 @@ typedef unsigned long uint32_t;
 //#define FOSC 11059200L      //System frequency
 #define FOSC 20000000L      //System frequency
 
+#define TASK_STARTUP 0
+#define TASK_UI		 1
+#define TASK_PROJECT 2
+#define TASK_PURGE	 3
+#define TASK_HOME	 4
+#define TASK_CALIBRA 5
+#define TASK_TEST	 10
+
 typedef enum
 {
 	DISABLE = 0,
@@ -34,5 +42,7 @@ typedef enum
 	CW = 0,	//正转
 	CCW,	//反转
 }Direction_TypeDef;
+
+void createTask(uint8_t task);
 
 #endif

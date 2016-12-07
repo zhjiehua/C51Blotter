@@ -66,7 +66,7 @@ const Action_TypeDef actionDemo = {
 	SAMPLE_TIPS,
 	SHORT_VOICE,
 	1.0,
-	0,
+	1,
 	SLOW_SPEED,
 	{0, 1},
 	1,
@@ -109,14 +109,6 @@ void initCaliPumpPara(float para)
 }
 
 /******************************************************************************************************/
-
-////提示1页面提示内容
-//void tips1Show(TipsSource_TypeDef tipsSource, char *str)
-//{
-//	SetScreen(TIPS1PAGE_INDEX);
-//	SetTextValue(TIPS1PAGE_INDEX, TIPS1_TIPS_EDIT, str);
-//	pProjectMan->tipsSource = tipsSource;
-//}
 
 //灌注管道
 void fillTube(void)
@@ -233,8 +225,6 @@ void fillTube(void)
 
 	//清状态显示
 	SetTextValue(RUNNINGPAGE_INDEX, RUNNING_STATUS_EDIT, "");
-
-	//SetScreen(RUNNINGPAGE_INDEX);//跳转到运行页面
 }
 
 //放置板卡
@@ -244,9 +234,12 @@ void placePlate(void)
 	uint8_t relCoord;
 	uint8_t str[50];
 	uint16_t i;
-	startPlate = pProjectMan->startTank/TANK_PER_PLATE+1;
-	endPlate = pProjectMan->endTank/TANK_PER_PLATE+1;
+	startPlate = (pProjectMan->startTank-1)/TANK_PER_PLATE+1;
+	endPlate = (pProjectMan->endTank-1)/TANK_PER_PLATE+1;
 	
+	//状态显示放置槽板中
+	SetTextValue(RUNNINGPAGE_INDEX, RUNNING_STATUS_EDIT, "In placing Plate……");
+
 	for(i=startPlate;i<=endPlate;i++)
 	{
 		//将对应槽板转到手动点
@@ -262,6 +255,10 @@ void placePlate(void)
 		SetScreen(RUNNINGPAGE_INDEX);//跳转到运行页面
 		pProjectMan->tipsButton = TIPS_NONE;		
 	}
+
+	//清状态显示
+	SetTextValue(RUNNINGPAGE_INDEX, RUNNING_STATUS_EDIT, "");
+
 	//SetScreen(RUNNINGPAGE_INDEX);//跳转到运行页面	
 }
 
@@ -362,7 +359,7 @@ void adding(void)
 		SetTextValue(RUNNINGPAGE_INDEX, RUNNING_STATUS_EDIT, "In adding……");
 
 		//更新泵辑框内容为当前选择的泵编号
-		SetTextValueInt32(RUNNINGPAGE_INDEX, RUNNING_PUMP_EDIT, pProjectMan->pCurRunningAction->pump);		
+		SetTextValueInt32(RUNNINGPAGE_INDEX, RUNNING_PUMP_EDIT, pProjectMan->pCurRunningAction->pump+1);		
 
 		for(i=pProjectMan->startTank;i<=pProjectMan->endTank;i++)
 		{
@@ -377,13 +374,14 @@ void adding(void)
 			pDCMotor->SetCMD(pProjectMan->pCurRunningAction->pump, ENABLE);
 			time = pProjectMan->pCurRunningAction->addAmount*pProjectMan->pCaliPumpPara[pProjectMan->pCurRunningAction->pump];
 			os_wait(K_TMO, 150*time, 0);
-			pDCMotor->SetCMD(pProjectMan->pCurRunningAction->pump, ENABLE);
-			
+			pDCMotor->SetCMD(pProjectMan->pCurRunningAction->pump, DISABLE);	
 		}	
 	}
 
 	//更新加注编辑框内容为0
 	SetTextValueInt32(RUNNINGPAGE_INDEX, RUNNING_ADDTANK_EDIT, 0);
+	//更新泵辑框内容为0
+	SetTextValueInt32(RUNNINGPAGE_INDEX, RUNNING_PUMP_EDIT, 0);
 
 	//清状态显示
 	SetTextValue(RUNNINGPAGE_INDEX, RUNNING_STATUS_EDIT, "");	
@@ -408,21 +406,107 @@ void incubation(void)
 				pStepMotor->SetSpeed(5);
 			break;
 			case 1:	 //中
-				pStepMotor->SetSpeed(7);
+				pStepMotor->SetSpeed(9);
 			break;
 			case 2:	 //快
-				pStepMotor->SetSpeed(8);
+				pStepMotor->SetSpeed(13);
 			break;
 			default: //默认
 				pStepMotor->SetSpeed(5);
 			break;
 		}
 
+		//使能暂停 停止按钮
+		SetControlEnable(RUNNINGPAGE_INDEX, RUNNING_PAUSE_BUTTON, 1);
+		SetControlEnable(RUNNINGPAGE_INDEX, RUNNING_STOP_BUTTON, 1);
+
 		//转动转盘并等待孵育时间到
 		pStepMotor->SetCMD(ENABLE);
-		while(!pProjectMan->RTCTimeout); //等待时间到
+
+		while(pProjectMan->RTCTimeout == 0) //等待时间到
+		{
+			//检查是否有暂停
+			if(pProjectMan->exception == EXCEPTION_PAUSE)
+			{
+				pStepMotor->SetCMD(DISABLE);   //前2个位置到立即减速
+		
+//				pStepMotor->SetPos(2);
+//				while(!pStepMotor->IsOnPos())
+//				{
+//					if(pSensor->GetStatus(SENSOR_POS))
+//						pStepMotor->UpdatePos();	
+//				} 
+//				pStepMotor->Stop();	  //终点位置到立即停止
+//
+//				//等到电机真正停止
+//				while(!pStepMotor->IsStop());
+
+				//停止并对准槽
+				pStepMotor->Position(CCW, 2);
+
+				//暂停RTC
+				PauseTimer(RUNNINGPAGE_INDEX, RUNNING_TIME_RTC);
+
+				//等到恢复
+				while(pProjectMan->exception != EXCEPTION_NONE)
+				{
+					if(pProjectMan->rotateFlag == 1)
+					{
+						//下一个槽
+						pStepMotor->Position(CCW, 1);
+						pProjectMan->rotateFlag = 0;
+					}
+				}
+
+				if(pProjectMan->jumpTo == 1) //暂停页面的跳转功能用到
+				{
+					pProjectMan->curLoopTime = pProjectMan->pCurRunningAction->loopTime; //用于退出循环	
+					pStepMotor->Home();	//回原点
+					pProjectMan->jumpTo = 0;
+					return;
+				}
+
+				//设置摇动速度
+				switch(pProjectMan->pCurRunningAction->shakeSpeed)
+				{
+					case 0:	 //慢
+						pStepMotor->SetSpeed(5);
+					break;
+					case 1:	 //中
+						pStepMotor->SetSpeed(9);
+					break;
+					case 2:	 //快
+						pStepMotor->SetSpeed(13);
+					break;
+					default: //默认
+						pStepMotor->SetSpeed(5);
+					break;
+				}
+
+				//转动转盘并等待孵育时间到
+				pStepMotor->SetCMD(ENABLE);
+
+				//恢复RTC
+				StartTimer(RUNNINGPAGE_INDEX, RUNNING_TIME_RTC);
+			}
+			else if(pProjectMan->exception == EXCEPTION_STOP)
+			{
+				pStepMotor->SetCMD(DISABLE);   //前2个位置到立即减速
+
+				//停止并对准槽
+				pStepMotor->Position(CCW, 2);
+				StartTimer(RUNNINGPAGE_INDEX, RUNNING_TIME_RTC);
+				pProjectMan->RTCTimeout = 0;
+
+				os_delete_task(TASK_PROJECT);	//删除自己	
+			}
+		}
 		pProjectMan->RTCTimeout = 0;
 		
+		//除能暂停 停止按钮
+		SetControlEnable(RUNNINGPAGE_INDEX, RUNNING_PAUSE_BUTTON, 0);
+		SetControlEnable(RUNNINGPAGE_INDEX, RUNNING_STOP_BUTTON, 0);
+
 		//结束需要回原点
 		pStepMotor->Home();	
 	}
@@ -450,6 +534,12 @@ void projectProgram(void)
 	//清状态显示
 	SetTextValue(RUNNINGPAGE_INDEX, RUNNING_STATUS_EDIT, "");
 
+	//等到转盘停止
+	while(!pStepMotor->IsStop());
+
+	//回原点
+	pStepMotor->Home();
+
 	//灌注管道
 	fillTube();
 
@@ -469,7 +559,6 @@ void projectProgram(void)
 		rtcTime = pProjectMan->pCurProject->action[0].shakeTime.hour*3600
 					+ pProjectMan->pCurProject->action[0].shakeTime.minute*60;
 		SeTimer(RUNNINGPAGE_INDEX, RUNNING_TIME_RTC, rtcTime);
-
 
 		for(pProjectMan->curLoopTime=1;pProjectMan->curLoopTime<=pProjectMan->pCurRunningAction->loopTime;pProjectMan->curLoopTime++)
 		{
@@ -510,6 +599,9 @@ void wasteFluidAbsorb(void)
 {
 	uint8_t relCoord;
 
+	//状态显示孵育中
+	SetTextValue(RUNNINGPAGE_INDEX, RUNNING_STATUS_EDIT, "In absorb waste fluid……");
+
 	//将废液槽转到废液口位置
 	relCoord = pStepMotor->Abs2Rel(AbsCoordinate[8]); //废液口位置
 	pStepMotor->RelativePosition(relCoord, AbsCoordinate[9]); //将废液槽转到废液口
@@ -536,6 +628,9 @@ void wasteFluidAbsorb(void)
 
 	//停止真空泵
 	pDCMotor->SetCMD(PUMP_VACUUM, DISABLE);
+
+	//状态显示孵育中
+	SetTextValue(RUNNINGPAGE_INDEX, RUNNING_STATUS_EDIT, "");
 }
 
 //清洗程序
@@ -558,7 +653,7 @@ void purgeProgram(void)
 	SetScreen(PURGEPAGE_INDEX);//跳转到清洗页面
 
 	//回原点
-	//pStepMotor->Home();
+	pStepMotor->Home();
 
 	//将手动点回原位
 	relCoord = pStepMotor->Abs2Rel(AbsCoordinate[9]);
@@ -639,6 +734,22 @@ void purgeProgram(void)
 	SetScreen(PURGEPAGE_INDEX);//跳转到清洗页面
 
 	SetButtonValue(PURGEPAGE_INDEX, PURGE_START_BUTTON, 0x00); //设置按键为弹起状态	
+}
+
+/****************************************************************************************/
+
+void homeProgram(void)
+{
+	//回原点
+	pStepMotor->Home();
+	SetScreen(MAINPAGE_INDEX);
+	beepAlarm(1);
+}
+
+/****************************************************************************************/
+void calibraProgram(void)
+{
+	;
 }
 
 #ifdef __cplusplus

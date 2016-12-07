@@ -162,8 +162,14 @@ void ProcessMessage( PCTRL_MSG msg, uint16 size )
 		break;
 	case NOTIFY_ONLINE:
 		cDebug("NOTIFY_ONLINE\n");
-		pProjectMan->runningType = RUNNING_HOME;
+		//pProjectMan->runningType = RUNNING_HOME;
 		//SetScreen(MAINPAGE_INDEX);
+
+		//创建线程
+		//os_create_task(TASK_HOME);	//创建回原点任务，如果直接执行创建任务，会出现死机
+
+		createTask(TASK_HOME);
+
 		break;
 	default:
 		break;

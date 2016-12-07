@@ -4,6 +4,7 @@
 #include "stdio.h"
 #include "../CPrintf.h"
 #include "../Peripheral/stepmotor.h"
+#include "../Peripheral/io.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -14,110 +15,6 @@ extern "C" {
 /************************************************************************/
 ProjectMan_TypeDef ProjectMan;
 ProjectMan_TypeDef *pProjectMan = &ProjectMan;
-
-
-void tipsPageProcess(void)
-{
-	//提示页面分类按钮处理
-	switch(pProjectMan->tipsSource)
-	{
-	//tips1页面
-	case TIPSSOURCE_FILLTIPS:  //提示是否灌注管道
-		if(pProjectMan->tipsButton != TIPS_NONE)
-		{
-			if(pProjectMan->tipsButton == TIPS_OK)  //跳到泵选择页面
-			{
-				//跳到泵选择页面选择要灌注的管道
-				SetScreen(SELECTPUMPPAGE_INDEX);
-				BatchBegin(SELECTPUMPPAGE_INDEX);
-				BatchSetButtonValue(PUMPSEL_PUMP1_BUTTON, pProjectMan->pumpSelPumpSel&PUMP1_MASK);
-				BatchSetButtonValue(PUMPSEL_PUMP2_BUTTON, pProjectMan->pumpSelPumpSel&PUMP2_MASK);
-				BatchSetButtonValue(PUMPSEL_PUMP3_BUTTON, pProjectMan->pumpSelPumpSel&PUMP3_MASK);
-				BatchSetButtonValue(PUMPSEL_PUMP4_BUTTON, pProjectMan->pumpSelPumpSel&PUMP4_MASK);
-				BatchSetButtonValue(PUMPSEL_PUMP5_BUTTON, pProjectMan->pumpSelPumpSel&PUMP5_MASK);
-				BatchSetButtonValue(PUMPSEL_PUMP6_BUTTON, pProjectMan->pumpSelPumpSel&PUMP6_MASK);
-				BatchSetButtonValue(PUMPSEL_PUMP7_BUTTON, pProjectMan->pumpSelPumpSel&PUMP7_MASK);
-				BatchSetButtonValue(PUMPSEL_PUMP8_BUTTON, pProjectMan->pumpSelPumpSel&PUMP8_MASK);
-				BatchEnd();
-			}
-			else  //跳到运行页面，放置槽板
-			{
-				//跳回到运行页面，执行动作
-				SetScreen(RUNNINGPAGE_INDEX);
-				pProjectMan->proStatus = PROJECTSTATUS_PLACEPLATE;
-			}
-			pProjectMan->tipsButton = TIPS_NONE;
-			pProjectMan->tipsSource = TIPSSOURCE_NONE;
-		}
-		break;
-	case TIPSSOURCE_RUNNINGPAUSE:  //暂停按钮按下
-		{
-			if(pProjectMan->tipsButton != TIPS_NONE)
-			{
-				if(pProjectMan->tipsButton == TIPS_OK)
-				{
-					//跳到暂停页面
-					pProjectMan->pCurJumptoAction = pProjectMan->pCurRunningAction;
-					SetTextValue(PAUSEPAGE_INDEX, PAUSE_ACTIONNAME_EDIT, pProjectMan->pCurJumptoAction->name);
-					SetScreen(PAUSEPAGE_INDEX);
-					pProjectMan->preProStatus = pProjectMan->proStatus;
-					pProjectMan->proStatus = PROJECTSTATUS_PAUSE;
-
-					cDebug("======== PAUSE the program!\n");
-				}
-				else
-				{
-					//跳回到运行页面，执行动作
-					SetScreen(RUNNINGPAGE_INDEX);
-				}
-				pProjectMan->tipsButton = TIPS_NONE;
-				pProjectMan->tipsSource = TIPSSOURCE_NONE;
-			}
-		}
-		break;
-	case TIPSSOURCE_RUNNINGSTOP:  //停止按钮按下
-		{
-			if(pProjectMan->tipsButton != TIPS_NONE)
-			{
-				if(pProjectMan->tipsButton == TIPS_OK)
-				{
-					//跳到项目页面
-					SetScreen(PROJECTPAGE_INDEX);
-					pProjectMan->runningType = RUNNING_NONE;
-					pProjectMan->proStatus = PROJECTSTATUS_IDLE;
-
-					cDebug("======== STOP the program!\n");
-				}
-				else
-				{
-					//跳回到运行页面，执行动作
-					SetScreen(RUNNINGPAGE_INDEX);
-				}
-				pProjectMan->tipsButton = TIPS_NONE;
-				pProjectMan->tipsSource = TIPSSOURCE_NONE;
-			}
-		}
-		break;
-	
-	//tips1页面
-	case TIPSSOURCE_PUTWASTETANK:
-		if(pProjectMan->tipsButton == TIPS_OK)
-		{
-			//跳回到运行页面，执行动作
-			SetScreen(RUNNINGPAGE_INDEX);
-
-			pProjectMan->tipsButton = TIPS_NONE;
-			pProjectMan->tipsSource = TIPSSOURCE_NONE;
-		}
-		break;
-
-	case TIPSSOURCE_NONE:
-		break;
-	default:
-		break;
-	}
-}
-
 
 void initProjectMan(ProjectMan_TypeDef *pm)
 {
@@ -146,9 +43,13 @@ void initProjectMan(ProjectMan_TypeDef *pm)
 
 	pm->tipsButton = TIPS_NONE;
 	pm->runningType = RUNNING_NONE;
-	pm->proStatus = PROJECTSTATUS_IDLE;
-	pm->preProStatus = PROJECTSTATUS_IDLE;
-	pm->tipsSource = TIPSSOURCE_NONE;
+	pm->exception = EXCEPTION_NONE;
+	pm->exceptionButtonFlag = EXCEPTION_NONE;
+	pm->rotateFlag = 0;
+	pm->jumpTo = 0;
+//	pm->proStatus = PROJECTSTATUS_IDLE;
+//	pm->preProStatus = PROJECTSTATUS_IDLE;
+//	pm->tipsSource = TIPSSOURCE_NONE;
 }
 
 /************************************************************************/
@@ -193,17 +94,6 @@ void initUI(void)
 
 void loopForever(void)
 {
-//	//处理UI数据
-//	uint8 size = queue_find_cmd(cmd_buffer,CMD_MAX_SIZE); //从缓冲区中获取一条指令
-//	if(size>0)//接受到指令
-//	{
-//		ProcessMessage((PCTRL_MSG)cmd_buffer, size);//处理指令
-//	}
-//
-//	tipsPageProcess();
-
-	//purgeProgram();
-
 	/************************************************************************/
 	/*处理流程                                                              */
 	/************************************************************************/
@@ -231,6 +121,7 @@ void loopForever(void)
 		pStepMotor->Home();
 		SetScreen(MAINPAGE_INDEX);
 		pProjectMan->runningType = RUNNING_NONE;
+		beepAlarm(1);
 		break;
 	default:
 		break;
