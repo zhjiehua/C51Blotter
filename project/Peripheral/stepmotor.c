@@ -54,22 +54,40 @@ const uint8_t AbsCoordinate[10] =
 //	{F4R,  70*SPEED_CONST},
 //};
 
+////定位速度
+//const SpeedLevel_TypeDef speedLevel[] = {
+//	{STEPMOTOR_FREQ(0.02), 0.02*SPEED_CONST},
+//	{STEPMOTOR_FREQ(0.05), 0.05*SPEED_CONST},
+//	{STEPMOTOR_FREQ(0.1),  0.1*SPEED_CONST},
+//	{STEPMOTOR_FREQ(0.15), 0.15*SPEED_CONST},
+//	{STEPMOTOR_FREQ(0.3), 0.3*SPEED_CONST},
+//	{STEPMOTOR_FREQ(0.5), 0.5*SPEED_CONST},
+//	{STEPMOTOR_FREQ(0.7), 0.7*SPEED_CONST},
+//	{STEPMOTOR_FREQ(0.9), 0.9*SPEED_CONST},
+//	{STEPMOTOR_FREQ(1.0), 1.0*SPEED_CONST},
+//	{STEPMOTOR_FREQ(1.2), 1.2*SPEED_CONST},
+//	{STEPMOTOR_FREQ(1.4), 1.4*SPEED_CONST},
+//	{STEPMOTOR_FREQ(1.6), 1.6*SPEED_CONST},
+//	{STEPMOTOR_FREQ(1.8), 1.8*SPEED_CONST},
+//	{STEPMOTOR_FREQ(2.0), 2.0*SPEED_CONST},
+//};
+
 //定位速度
 const SpeedLevel_TypeDef speedLevel[] = {
-	{STEPMOTOR_FREQ(0.02), 0.02*SPEED_CONST},
-	{STEPMOTOR_FREQ(0.05), 0.05*SPEED_CONST},
-	{STEPMOTOR_FREQ(0.1),  0.1*SPEED_CONST},
+	{STEPMOTOR_FREQ(0.10), 0.10*SPEED_CONST},
 	{STEPMOTOR_FREQ(0.15), 0.15*SPEED_CONST},
-	{STEPMOTOR_FREQ(0.3), 0.3*SPEED_CONST},
-	{STEPMOTOR_FREQ(0.5), 0.4*SPEED_CONST},
-	{STEPMOTOR_FREQ(0.7), 0.7*SPEED_CONST},
-	{STEPMOTOR_FREQ(0.9), 0.9*SPEED_CONST},
-	{STEPMOTOR_FREQ(1.0), 1.0*SPEED_CONST},
-	{STEPMOTOR_FREQ(1.2), 1.2*SPEED_CONST},
-	{STEPMOTOR_FREQ(1.4), 1.4*SPEED_CONST},
-	{STEPMOTOR_FREQ(1.6), 1.6*SPEED_CONST},
-	{STEPMOTOR_FREQ(1.8), 1.8*SPEED_CONST},
-	{STEPMOTOR_FREQ(2.0), 2.0*SPEED_CONST},
+	{STEPMOTOR_FREQ(0.20), 0.20*SPEED_CONST},
+	{STEPMOTOR_FREQ(0.30), 0.30*SPEED_CONST},
+	{STEPMOTOR_FREQ(0.45), 0.45*SPEED_CONST},
+	{STEPMOTOR_FREQ(0.60), 0.60*SPEED_CONST},
+	{STEPMOTOR_FREQ(0.80), 0.80*SPEED_CONST},
+	{STEPMOTOR_FREQ(1.00), 1.00*SPEED_CONST},
+	{STEPMOTOR_FREQ(1.20), 1.20*SPEED_CONST},
+	{STEPMOTOR_FREQ(1.40), 1.40*SPEED_CONST},
+	{STEPMOTOR_FREQ(1.60), 1.60*SPEED_CONST},
+	{STEPMOTOR_FREQ(1.80), 1.80*SPEED_CONST},
+	{STEPMOTOR_FREQ(2.00), 2.00*SPEED_CONST},
+	{STEPMOTOR_FREQ(2.20), 2.20*SPEED_CONST},
 };
 
 const uint8_t speedLevelSize = (sizeof(speedLevel)/sizeof(speedLevel[0]));
@@ -122,6 +140,18 @@ static void StepMotor_Stop(void)
 	pStepMotor->speedStatus = SPEED_STOP;
 	
 	TF1 = 1; //进入定时器1中断		
+}
+
+static void StepMotor_StopAndAlign(uint8_t len)
+{
+	pStepMotor->SetPos(len);
+	while(!pStepMotor->IsOnPos())
+	{
+		if(pSensor->GetStatus(SENSOR_POS))
+			pStepMotor->UpdatePos();	
+	} 
+	pStepMotor->Stop();	  //终点位置到立即停止
+	while(!pStepMotor->IsStop());//等到电机停止
 }
 
 static void StepMotor_SetPos(uint8_t pos)
@@ -326,7 +356,7 @@ static void StepMotor_RelativePosition(uint8_t desTank, uint8_t srcTank)
 //步进电机初始化
 void StepMotor_Init(void)
 {
-	pStepMotor->offset = 450;
+	pStepMotor->offset = STEPMOTOR_OFFSET;
 	pStepMotor->speedStatus = SPEED_NONE;
 	pStepMotor->pSpeedLevel = speedLevel;
 	pStepMotor->curSpeedIndex = 0;
@@ -341,6 +371,7 @@ void StepMotor_Init(void)
 	pStepMotor->UpdatePos = StepMotor_UpdatePos;
 	pStepMotor->IsOnPos = StepMotor_IsOnPos;
 	pStepMotor->IsStop = StepMotor_IsStop;
+	pStepMotor->StopAndAlign = StepMotor_StopAndAlign;
 
 	pStepMotor->Home = StepMotor_Home;
 	pStepMotor->Abs2Rel = StepMotor_Abs2Rel;
@@ -387,8 +418,6 @@ void tm1_isr() interrupt 3 using 3
 			{
 				cnt = 0;
 				pStepMotor->curSpeedIndex++;
-	
-				//Uart_SendData(0x01);
 			}
 	
 			if(pStepMotor->curSpeedIndex >= pStepMotor->desSpeedIndex) //加速完成
@@ -405,8 +434,6 @@ void tm1_isr() interrupt 3 using 3
 			{
 				cnt = 0;
 				pStepMotor->curSpeedIndex--;
-	
-				//Uart_SendData(0x02);
 			}
 	
 			if(pStepMotor->curSpeedIndex <= 0)  //减速到最小速度
@@ -421,23 +448,53 @@ void tm1_isr() interrupt 3 using 3
 		break;
 		case SPEED_STOP: 
 		{
-			pStepMotor->curSpeedIndex = 0;
+//			pStepMotor->curSpeedIndex = 0;
+//			pStepMotor->speedStatus = SPEED_POSOFFSET;
+//	
+//			cnt = 0;
+//			//TR1 = 0;  //停止定时器1
+
+			cnt++;
+			if(cnt >= pStepMotor->pSpeedLevel[pStepMotor->curSpeedIndex].speedConst)
+			{
+				cnt = 0;
+				pStepMotor->curSpeedIndex--;
+			}
+	
+			if(pStepMotor->curSpeedIndex <= 0)  //减速到最小速度
+			{
+				pStepMotor->curSpeedIndex = 0;			
+				cnt = 0;
+			}
 			pStepMotor->speedStatus = SPEED_POSOFFSET;
-	
-			cnt = 0;
-			//TR1 = 0;  //停止定时器1
-	
-			//TF1 = 0;
-			//Uart_SendData(0x03);
 		}
 		break;
 		case SPEED_POSOFFSET:
 		{
-			if(cnt++ >= pStepMotor->offset)
+			static uint16_t offset = 0;
+
+			offset++;
+			if(offset++ >= pStepMotor->offset)
 			{
+				pStepMotor->curSpeedIndex = 0;
 				pStepMotor->speedStatus = SPEED_NONE;
 				TR1 = 0;  //停止定时器1
-				cnt = 0;	
+				offset = 0;
+				cnt = 0;
+				break;	
+			}
+
+			cnt++;
+			if(cnt >= pStepMotor->pSpeedLevel[pStepMotor->curSpeedIndex].speedConst)
+			{
+				cnt = 0;
+				pStepMotor->curSpeedIndex--;
+			}
+	
+			if(pStepMotor->curSpeedIndex <= 0)  //减速到最小速度
+			{
+				pStepMotor->curSpeedIndex = 0;
+				cnt = 0;
 			}
 		}
 		break;

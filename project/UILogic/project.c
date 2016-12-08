@@ -240,7 +240,8 @@ void placePlate(void)
 	//状态显示放置槽板中
 	SetTextValue(RUNNINGPAGE_INDEX, RUNNING_STATUS_EDIT, "In placing Plate……");
 
-	for(i=startPlate;i<=endPlate;i++)
+	//for(i=startPlate;i<=endPlate;i++)
+	for(i=endPlate;i>=startPlate;i--)
 	{
 		//将对应槽板转到手动点
 		relCoord = pStepMotor->Abs2Rel(AbsCoordinate[9]);	
@@ -266,6 +267,7 @@ void placePlate(void)
 void imbibition(void)
 {
 	uint16_t i;
+	uint8_t relCoord;
 
 	if(pProjectMan->pCurRunningAction->imbiAmount)//吸液量大于0
 	{
@@ -275,13 +277,15 @@ void imbibition(void)
 		//启动真空泵
 		pDCMotor->SetCMD(PUMP_VACUUM, ENABLE);
 		
-		for(i=pProjectMan->startTank;i<=pProjectMan->endTank;i++)
+		//for(i=pProjectMan->startTank;i<=pProjectMan->endTank;i++)
+		for(i=pProjectMan->endTank;i>=pProjectMan->startTank;i--)
 		{
 			//更新吸液编辑框内容为当前槽
 			SetTextValueInt32(RUNNINGPAGE_INDEX, RUNNING_IMBITANK_EDIT, i);			
 
-			//将对应槽转到吸液口位置	
-			pStepMotor->RelativePosition(AbsCoordinate[8], i);
+			//将对应槽转到吸液口位置
+			relCoord = pStepMotor->Abs2Rel(AbsCoordinate[8]);	
+			pStepMotor->RelativePosition(relCoord, i);
 			
 			//放下废液口
 			pDCMotor->WastePump_SetPos(DOWN);
@@ -316,7 +320,8 @@ void hint(void)
 		//状态显示吸液中
 		SetTextValue(RUNNINGPAGE_INDEX, RUNNING_STATUS_EDIT, "In hinting……");
 		
-		for(i=pProjectMan->startTank;i<=pProjectMan->endTank;i++)
+		//for(i=pProjectMan->startTank;i<=pProjectMan->endTank;i++)
+		for(i=pProjectMan->endTank;i>=pProjectMan->startTank;i--)
 		{	
 			//将对应槽转到手动点位置
 			relCoord = pStepMotor->Abs2Rel(AbsCoordinate[9]);	
@@ -361,7 +366,8 @@ void adding(void)
 		//更新泵辑框内容为当前选择的泵编号
 		SetTextValueInt32(RUNNINGPAGE_INDEX, RUNNING_PUMP_EDIT, pProjectMan->pCurRunningAction->pump+1);		
 
-		for(i=pProjectMan->startTank;i<=pProjectMan->endTank;i++)
+		//for(i=pProjectMan->startTank;i<=pProjectMan->endTank;i++)
+		for(i=pProjectMan->endTank;i>=pProjectMan->startTank;i--)
 		{
 			//更新加注编辑框内容为当前槽
 			SetTextValueInt32(RUNNINGPAGE_INDEX, RUNNING_ADDTANK_EDIT, i);			
@@ -417,8 +423,8 @@ void incubation(void)
 		}
 
 		//使能暂停 停止按钮
-		SetControlEnable(RUNNINGPAGE_INDEX, RUNNING_PAUSE_BUTTON, 1);
-		SetControlEnable(RUNNINGPAGE_INDEX, RUNNING_STOP_BUTTON, 1);
+		SetControlVisiable(RUNNINGPAGE_INDEX, RUNNING_PAUSE_BUTTON, 1);
+		SetControlVisiable(RUNNINGPAGE_INDEX, RUNNING_STOP_BUTTON, 1);
 
 		//转动转盘并等待孵育时间到
 		pStepMotor->SetCMD(ENABLE);
@@ -428,24 +434,11 @@ void incubation(void)
 			//检查是否有暂停
 			if(pProjectMan->exception == EXCEPTION_PAUSE)
 			{
-				pStepMotor->SetCMD(DISABLE);   //前2个位置到立即减速
-		
-//				pStepMotor->SetPos(2);
-//				while(!pStepMotor->IsOnPos())
-//				{
-//					if(pSensor->GetStatus(SENSOR_POS))
-//						pStepMotor->UpdatePos();	
-//				} 
-//				pStepMotor->Stop();	  //终点位置到立即停止
-//
-//				//等到电机真正停止
-//				while(!pStepMotor->IsStop());
-
-				//停止并对准槽
-				pStepMotor->Position(CCW, 2);
-
 				//暂停RTC
 				PauseTimer(RUNNINGPAGE_INDEX, RUNNING_TIME_RTC);
+
+				//停止并对准槽
+				pStepMotor->StopAndAlign(2);
 
 				//等到恢复
 				while(pProjectMan->exception != EXCEPTION_NONE)
@@ -462,7 +455,7 @@ void incubation(void)
 				{
 					pProjectMan->curLoopTime = pProjectMan->pCurRunningAction->loopTime; //用于退出循环	
 					pStepMotor->Home();	//回原点
-					pProjectMan->jumpTo = 0;
+					//pProjectMan->jumpTo = 0;
 					return;
 				}
 
@@ -485,27 +478,27 @@ void incubation(void)
 
 				//转动转盘并等待孵育时间到
 				pStepMotor->SetCMD(ENABLE);
-
+				pProjectMan->RTCTimeout = 0;
 				//恢复RTC
 				StartTimer(RUNNINGPAGE_INDEX, RUNNING_TIME_RTC);
 			}
 			else if(pProjectMan->exception == EXCEPTION_STOP)
 			{
-				pStepMotor->SetCMD(DISABLE);   //前2个位置到立即减速
+				StopTimer(RUNNINGPAGE_INDEX, RUNNING_TIME_RTC);
 
 				//停止并对准槽
-				pStepMotor->Position(CCW, 2);
-				StartTimer(RUNNINGPAGE_INDEX, RUNNING_TIME_RTC);
+				pStepMotor->StopAndAlign(2);
+
 				pProjectMan->RTCTimeout = 0;
 
 				os_delete_task(TASK_PROJECT);	//删除自己	
 			}
 		}
-		pProjectMan->RTCTimeout = 0;
-		
+		pProjectMan->RTCTimeout = 0;		
+
 		//除能暂停 停止按钮
-		SetControlEnable(RUNNINGPAGE_INDEX, RUNNING_PAUSE_BUTTON, 0);
-		SetControlEnable(RUNNINGPAGE_INDEX, RUNNING_STOP_BUTTON, 0);
+		SetControlVisiable(RUNNINGPAGE_INDEX, RUNNING_PAUSE_BUTTON, 0);
+		SetControlVisiable(RUNNINGPAGE_INDEX, RUNNING_STOP_BUTTON, 0);
 
 		//结束需要回原点
 		pStepMotor->Home();	
@@ -537,6 +530,9 @@ void projectProgram(void)
 	//等到转盘停止
 	while(!pStepMotor->IsStop());
 
+	//状态显示吸液中
+	SetTextValue(RUNNINGPAGE_INDEX, RUNNING_STATUS_EDIT, "In preparing……");
+
 	//回原点
 	pStepMotor->Home();
 
@@ -546,9 +542,19 @@ void projectProgram(void)
 	//放置板卡
 	placePlate();
 
+	//状态显示吸液中
+	SetTextValue(RUNNINGPAGE_INDEX, RUNNING_STATUS_EDIT, "Preparation finish");
+
 	//执行动作
 	for(i=0;i<ACTION_COUNT_PER_PROJECT;i++)
 	{
+		if(pProjectMan->jumpTo == 1)
+		{
+			if(&pProjectMan->pCurRunningProject->action[i] != pProjectMan->pCurRunningAction)
+				continue;
+			else
+				pProjectMan->jumpTo = 0;	
+		}
 		pProjectMan->pCurRunningAction = &pProjectMan->pCurRunningProject->action[i];		
 		SetTextValue(RUNNINGPAGE_INDEX, RUNNING_ACTION_EDIT, pProjectMan->pCurRunningAction->name);
 		SetTextValueInt32(RUNNINGPAGE_INDEX, RUNNING_PUMP_EDIT, 0);
@@ -600,7 +606,8 @@ void wasteFluidAbsorb(void)
 	uint8_t relCoord;
 
 	//状态显示孵育中
-	SetTextValue(RUNNINGPAGE_INDEX, RUNNING_STATUS_EDIT, "In absorb waste fluid……");
+	SetTextValue(RUNNINGPAGE_INDEX, RUNNING_STATUS_EDIT, "In absorbing waste fluid……");
+	SetTextValue(PURGEPAGE_INDEX, PURGE_STATUS_EDIT, "In absorbing waste fluid……");
 
 	//将废液槽转到废液口位置
 	relCoord = pStepMotor->Abs2Rel(AbsCoordinate[8]); //废液口位置
@@ -631,24 +638,39 @@ void wasteFluidAbsorb(void)
 
 	//状态显示孵育中
 	SetTextValue(RUNNINGPAGE_INDEX, RUNNING_STATUS_EDIT, "");
+	SetTextValue(PURGEPAGE_INDEX, PURGE_STATUS_EDIT, "");
 }
 
 //清洗程序
 void purgeProgram(void)
 {
-	uint8_t i;
+	uint16_t i;
 	uint8_t relCoord;
-
+	uint8_t str[50];
+				
 	if(pProjectMan->purgePumpSel == 0x00)
 	{
 		SetButtonValue(PURGEPAGE_INDEX, PURGE_START_BUTTON, 0x00); //设置按键为弹起状态
 		return;
 	}
 
+	SetControlVisiable(PURGEPAGE_INDEX, PURGE_START_BUTTON, 0);
+	SetControlEnable(PURGEPAGE_INDEX, PURGE_PUMP1_BUTTON, 0);
+	SetControlEnable(PURGEPAGE_INDEX, PURGE_PUMP2_BUTTON, 0);
+	SetControlEnable(PURGEPAGE_INDEX, PURGE_PUMP3_BUTTON, 0);
+	SetControlEnable(PURGEPAGE_INDEX, PURGE_PUMP4_BUTTON, 0);
+	SetControlEnable(PURGEPAGE_INDEX, PURGE_PUMP5_BUTTON, 0);
+	SetControlEnable(PURGEPAGE_INDEX, PURGE_PUMP6_BUTTON, 0);
+	SetControlEnable(PURGEPAGE_INDEX, PURGE_PUMP7_BUTTON, 0);
+	SetControlEnable(PURGEPAGE_INDEX, PURGE_PUMP8_BUTTON, 0);
+
+	SetTextValue(PURGEPAGE_INDEX, PURGE_STATUS_EDIT, "In preparing……");
+
 	//提示将要清洗的管道置于蒸馏水中
 	SetScreen(TIPS1PAGE_INDEX);//跳转到提示1页面
 	SetTextValue(TIPS1PAGE_INDEX, TIPS1_TIPS_EDIT, "Please place the tube that to be washed in the distilled water");
-	while(pProjectMan->tipsButton == TIPS_NONE);
+	while(pProjectMan->tipsButton == TIPS_NONE)
+		beepAlarm(1);
 	pProjectMan->tipsButton = TIPS_NONE;
 	SetScreen(PURGEPAGE_INDEX);//跳转到清洗页面
 
@@ -661,16 +683,22 @@ void purgeProgram(void)
 
 	//提示将废液槽置于槽板号1的位置
 	SetScreen(TIPS1PAGE_INDEX);//跳转到提示1页面
-	SetTextValue(TIPS1PAGE_INDEX, TIPS1_TIPS_EDIT, "Please place the Waste Tank to the plate2");
-	while(pProjectMan->tipsButton == TIPS_NONE);
+	SetTextValue(TIPS1PAGE_INDEX, TIPS1_TIPS_EDIT, "Please place the Waste Tank to the plate1");
+	while(pProjectMan->tipsButton == TIPS_NONE)
+		beepAlarm(1);
 	pProjectMan->tipsButton = TIPS_NONE;
 	SetScreen(PURGEPAGE_INDEX);//跳转到清洗页面
 	
+	SetTextValue(PURGEPAGE_INDEX, PURGE_STATUS_EDIT, "Preparation finish");
+
 	//清洗要清洗的管道
 	for(i=0;i<8;i++)
 	{
 		if(pProjectMan->purgePumpSel & (0x01<<i))
 		{
+			sprintf(str, "Washing the tube %d", i+1);
+			SetTextValue(PURGEPAGE_INDEX, PURGE_STATUS_EDIT, str);
+
 			//将废液槽转到对应的泵位置
 			relCoord = pStepMotor->Abs2Rel(AbsCoordinate[i]);
 			pStepMotor->RelativePosition(relCoord, AbsCoordinate[9]); //AbsCoordinate[8]为废液槽
@@ -681,6 +709,8 @@ void purgeProgram(void)
 			os_wait(K_TMO, 6000, 0);
 			os_wait(K_TMO, 6000, 0);	
 			pDCMotor->SetCMD(i, DISABLE);
+
+			SetTextValue(PURGEPAGE_INDEX, PURGE_STATUS_EDIT, "");
 		}
 	}
 	
@@ -689,8 +719,9 @@ void purgeProgram(void)
 
 	//提示将要清洗的管道置于清洁干燥处
 	SetScreen(TIPS1PAGE_INDEX);//跳转到提示2页面
-	SetTextValue(TIPS1PAGE_INDEX, TIPS1_TIPS_EDIT, "Please place the tube that to be washed in the clean and dry place");
-	while(pProjectMan->tipsButton == TIPS_NONE);
+	SetTextValue(TIPS1PAGE_INDEX, TIPS1_TIPS_EDIT, "Please place the tubes that to be washed in the clean and dry place");
+	while(pProjectMan->tipsButton == TIPS_NONE)
+		beepAlarm(1);
 	pProjectMan->tipsButton = TIPS_NONE;
 	SetScreen(PURGEPAGE_INDEX);//跳转到清洗页面
 
@@ -699,6 +730,9 @@ void purgeProgram(void)
 	{
 		if(pProjectMan->purgePumpSel & (0x01<<i))
 		{
+			sprintf(str, "Pumping water from the tube %d", i+1);
+			SetTextValue(PURGEPAGE_INDEX, PURGE_STATUS_EDIT, str);
+
 			//将废液槽转到对应的泵位置
 			relCoord = pStepMotor->Abs2Rel(AbsCoordinate[i]);
 			pStepMotor->RelativePosition(relCoord, AbsCoordinate[9]); //AbsCoordinate[8]为3号槽（即废液槽）
@@ -709,6 +743,8 @@ void purgeProgram(void)
 			os_wait(K_TMO, 6000, 0);
 			os_wait(K_TMO, 6000, 0);
 			pDCMotor->SetCMD(i, DISABLE);
+
+			SetTextValue(PURGEPAGE_INDEX, PURGE_STATUS_EDIT, "");
 		}
 	}
 
@@ -722,18 +758,31 @@ void purgeProgram(void)
 	//提示取走废液槽
 	SetScreen(TIPS1PAGE_INDEX);//跳转到提示2页面
 	SetTextValue(TIPS1PAGE_INDEX, TIPS1_TIPS_EDIT, "Please take away the Waste Tank");
-	while(pProjectMan->tipsButton == TIPS_NONE);
+	while(pProjectMan->tipsButton == TIPS_NONE)
+		beepAlarm(1);
 	pProjectMan->tipsButton = TIPS_NONE;
 	SetScreen(PURGEPAGE_INDEX);//跳转到清洗页面
 
 	//提示清洗完成
 	SetScreen(TIPS1PAGE_INDEX);//跳转到提示2页面
 	SetTextValue(TIPS1PAGE_INDEX, TIPS1_TIPS_EDIT, "Wash finish");
-	while(pProjectMan->tipsButton == TIPS_NONE);
+	while(pProjectMan->tipsButton == TIPS_NONE)
+		beepAlarm(1);
 	pProjectMan->tipsButton = TIPS_NONE;
 	SetScreen(PURGEPAGE_INDEX);//跳转到清洗页面
 
-	SetButtonValue(PURGEPAGE_INDEX, PURGE_START_BUTTON, 0x00); //设置按键为弹起状态	
+	SetTextValue(PURGEPAGE_INDEX, PURGE_STATUS_EDIT, "Wash finish");
+
+	SetButtonValue(PURGEPAGE_INDEX, PURGE_START_BUTTON, 0x00); //设置按键为弹起状态
+	SetControlVisiable(PURGEPAGE_INDEX, PURGE_START_BUTTON, 1);
+	SetControlEnable(PURGEPAGE_INDEX, PURGE_PUMP1_BUTTON, 1);
+	SetControlEnable(PURGEPAGE_INDEX, PURGE_PUMP2_BUTTON, 1);
+	SetControlEnable(PURGEPAGE_INDEX, PURGE_PUMP3_BUTTON, 1);
+	SetControlEnable(PURGEPAGE_INDEX, PURGE_PUMP4_BUTTON, 1);
+	SetControlEnable(PURGEPAGE_INDEX, PURGE_PUMP5_BUTTON, 1);
+	SetControlEnable(PURGEPAGE_INDEX, PURGE_PUMP6_BUTTON, 1);
+	SetControlEnable(PURGEPAGE_INDEX, PURGE_PUMP7_BUTTON, 1);
+	SetControlEnable(PURGEPAGE_INDEX, PURGE_PUMP8_BUTTON, 1);	
 }
 
 /****************************************************************************************/

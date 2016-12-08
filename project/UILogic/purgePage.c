@@ -53,7 +53,9 @@ void purgePageButtonProcess(uint16 control_id, uint8  state)
 		case PURGE_START_BUTTON:
 			{
 				cDebug("========purgePage start to run the PURGE program!\n");
-				pProjectMan->runningType = RUNNING_PURGE;
+				//pProjectMan->runningType = RUNNING_PURGE;
+
+				createTask(TASK_PURGE);
 			}
 			break;
 		case PURGE_BACK_BUTTON:

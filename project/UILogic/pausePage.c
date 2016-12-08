@@ -31,11 +31,21 @@ void pausePageButtonProcess(uint16 control_id, uint8  state)
 		}
 		break;
 	case PAUSE_JUMPTO_BUTTON:
-		pProjectMan->pCurRunningAction = pProjectMan->pCurJumptoAction;
-		pProjectMan->jumpTo = 1;
-		pProjectMan->exception = EXCEPTION_NONE;
-		SetScreen(RUNNINGPAGE_INDEX);
-		cDebug("========pausePage JUMPTO program!\n");
+		if(pProjectMan->pCurJumptoAction <= pProjectMan->pCurRunningAction)//如果要跳到当前动作之前的动作的，当做是恢复按钮用
+		{
+			pProjectMan->exception = EXCEPTION_NONE;
+			SetScreen(RUNNINGPAGE_INDEX);
+		}
+		else
+		{
+			pProjectMan->pCurRunningAction = pProjectMan->pCurJumptoAction;
+			pProjectMan->jumpTo = 1;
+			pProjectMan->exception = EXCEPTION_NONE;
+			SetControlVisiable(RUNNINGPAGE_INDEX, RUNNING_PAUSE_BUTTON, 0);
+			SetControlVisiable(RUNNINGPAGE_INDEX, RUNNING_STOP_BUTTON, 0);
+			SetScreen(RUNNINGPAGE_INDEX);
+			cDebug("========pausePage JUMPTO program!\n");
+		}
 		break;
 	case PAUSE_ROTATE_BUTTON:
 		pProjectMan->rotateFlag = 1;

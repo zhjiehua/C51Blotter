@@ -22,6 +22,7 @@ sbit S_STEP2 = P3^4;
 #define STEPMOTOR_ANGLEPERSTEP  1.8  //步进电机步距角  
 #define STEPMOTOR_FREDIV  128  //步进电机分频系数
 #define STEPMOTOR_PULSEPERROUND  ((360/STEPMOTOR_ANGLEPERSTEP)*STEPMOTOR_FREDIV)  //步进电机每转需要多少个脉冲
+#define STEPMOTOR_OFFSET  800  //电机要对准槽孔，需要偏移
 
 #define SPEED_CONST  600 //用于加减速的步进时间常数
 
@@ -114,6 +115,7 @@ typedef struct
 	void (*UpdatePos)();
 	uint8_t (*IsOnPos)(void);
 	uint8_t (*IsStop)(void);
+	void (*StopAndAlign)(uint8_t len);
 
 	void (*Home)(void); //回原点
 	uint8_t (*Abs2Rel)(uint8_t absCoord);
