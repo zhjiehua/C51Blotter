@@ -1,6 +1,8 @@
 #include "pageCommon.h"
 #include "managerment.h"
 #include "CPrintf.h"
+#include "./Peripheral/24cxx.h"
+#include "project.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -12,10 +14,23 @@ void projectEditPageButtonProcess(uint16 control_id, uint8  state)
 	{
 		case PROEDIT_POSTPROJECT_BUTTON:
 		{
-			if(pProjectMan->pCurEditProject+1 > &project[PROJECT_COUNT-1])
-				pProjectMan->pCurEditProject = &project[0];
+//			if(pProjectMan->pCurEditProject+1 > &project[PROJECT_COUNT-1])
+//				pProjectMan->pCurEditProject = &project[0];
+//			else
+//				pProjectMan->pCurEditProject += 1;
+
+			//从EEPROM读取项目数据
+			uint16_t addrOffset;
+			//cDebug("pProjectMan->pCurEditProject->index = %d\n", (uint16_t)pProjectMan->pCurEditProject->index);
+			if(pProjectMan->pCurEditProject->index == PROJECT_COUNT-1)
+				addrOffset = 0;  //读出第一个项目参数
 			else
-				pProjectMan->pCurEditProject += 1;
+				addrOffset = pProjectMan->pCurEditProject->index+1;
+			cDebug("addrOffset = %d\n", (uint16_t)addrOffset);
+			AT24CXX_Read(PROJECT_BASEADDR+addrOffset*PROJECT_SIZE, (uint8_t*)project, PROJECT_SIZE);  //读出下一个项目参数			
+			cDebug("project[0].name = %s\n", project[0].name);
+			cDebug("project[0].index = %d\n", (uint16_t)(project[0].index));
+
 			pProjectMan->pCurEditAction = &pProjectMan->pCurEditProject->action[0];
 
 			SetTextValue(PROJECTEDITPAGE_INDEX, PROEDIT_PROJECTNAME_EDIT, pProjectMan->pCurEditProject->name);
@@ -24,10 +39,19 @@ void projectEditPageButtonProcess(uint16 control_id, uint8  state)
 		break;
 		case PROEDIT_PREPROJECT_BUTTON:
 		{
-			if(pProjectMan->pCurEditProject-1 < &project[0])
-				pProjectMan->pCurEditProject = &project[PROJECT_COUNT-1];
+//			if(pProjectMan->pCurEditProject-1 < &project[0])
+//				pProjectMan->pCurEditProject = &project[PROJECT_COUNT-1];
+//			else
+//				pProjectMan->pCurEditProject -= 1;
+
+			//从EEPROM读取项目数据
+			uint16_t addrOffset;
+			if(pProjectMan->pCurEditProject->index == 0)
+				addrOffset = PROJECT_COUNT-1;  //读出第一个项目参数
 			else
-				pProjectMan->pCurEditProject -= 1;
+				addrOffset = pProjectMan->pCurEditProject->index-1;
+			AT24CXX_Read(PROJECT_BASEADDR+addrOffset*PROJECT_SIZE, (uint8_t*)project, PROJECT_SIZE);  //读出上一个项目参数
+
 			pProjectMan->pCurEditAction = &pProjectMan->pCurEditProject->action[0];
 
 			SetTextValue(PROJECTEDITPAGE_INDEX, PROEDIT_PROJECTNAME_EDIT, pProjectMan->pCurEditProject->name);
@@ -36,7 +60,7 @@ void projectEditPageButtonProcess(uint16 control_id, uint8  state)
 		break;
 		case PROEDIT_POSTACTION_BUTTON:
 			{
-				if(pProjectMan->pCurEditAction+1 > &pProjectMan->pCurEditProject->action[ACTION_COUNT_PER_PROJECT-1])
+				if(pProjectMan->pCurEditAction+1 > &pProjectMan->pCurEditProject->action[ACTIONS_PER_PROJECT-1])
 					pProjectMan->pCurEditAction = &pProjectMan->pCurEditProject->action[0];
 				else
 					pProjectMan->pCurEditAction += 1;
@@ -47,7 +71,7 @@ void projectEditPageButtonProcess(uint16 control_id, uint8  state)
 		case PROEDIT_PREACTION_BUTTON:
 			{
 				if(pProjectMan->pCurEditAction-1 < &pProjectMan->pCurEditProject->action[0])
-					pProjectMan->pCurEditAction = &pProjectMan->pCurEditProject->action[ACTION_COUNT_PER_PROJECT-1];
+					pProjectMan->pCurEditAction = &pProjectMan->pCurEditProject->action[ACTIONS_PER_PROJECT-1];
 				else
 					pProjectMan->pCurEditAction -= 1;
 
@@ -88,13 +112,21 @@ void projectEditPageButtonProcess(uint16 control_id, uint8  state)
 
 void projectEditPageEditProcess(uint16 control_id, uint8 *str)
 {
+	uint16_t addrOffset;
 	switch(control_id)
 	{
 		case PROEDIT_PROJECTNAME_EDIT:
 			memcpy(pProjectMan->pCurEditProject->name, str, NAME_SIZE);
+			//cDebug("pProjectMan->pCurEditProject->name = %s\n", pProjectMan->pCurEditProject->name);
+			addrOffset = (pProjectMan->pCurEditProject->index+1)*PROJECT_SIZE - NAME_SIZE;
+			//cDebug("addrOffset = %d\n", addrOffset);
+			AT24CXX_Write(PROJECT_BASEADDR+addrOffset, pProjectMan->pCurEditProject->name, NAME_SIZE);  //保存参数
+			//cDebug("Save success\n");
 		break;
 		case PROEDIT_ACTIONNAME_EDIT:
 			memcpy(pProjectMan->pCurEditAction->name, str, NAME_SIZE);
+			addrOffset = pProjectMan->pCurEditProject->index*PROJECT_SIZE + (pProjectMan->pCurEditAction->index+1)*ACTION_SIZE - NAME_SIZE;
+			AT24CXX_Write(PROJECT_BASEADDR+addrOffset, pProjectMan->pCurEditAction->name, NAME_SIZE);  //保存参数
 		break;
 		default:
 			cDebug("projectEditPage EDIT error!\n");

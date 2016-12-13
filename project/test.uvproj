@@ -595,6 +595,21 @@
               <FileType>1</FileType>
               <FilePath>.\Peripheral\sensor.c</FilePath>
             </File>
+            <File>
+              <FileName>eeprom.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Peripheral\eeprom.c</FilePath>
+            </File>
+            <File>
+              <FileName>24cxx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Peripheral\24cxx.c</FilePath>
+            </File>
+            <File>
+              <FileName>myiic.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Peripheral\myiic.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>

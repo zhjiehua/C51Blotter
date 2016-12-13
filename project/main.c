@@ -4,6 +4,7 @@
 #include "./Peripheral/sensor.h"
 #include "./Peripheral/dcmotor.h"
 #include "./Peripheral/stepmotor.h"
+#include "./Peripheral/24cxx.h"
 
 #include "./HMI/cmd_queue.h"
 #include "./HMI/hmi_driver.h"
@@ -17,15 +18,24 @@
 //起始任务
 void startupTask(void) _task_ TASK_STARTUP  
 {
+	uint8_t i;
+	char n[10];
+
+	i = sizeof(Action_TypeDef);
+	i = sizeof(n);
+
 	//---------------初始化-------------------------------
 	IO_Init();
 	Uart_Init();//串口初始化
+	AT24CXX_Init(); //EEPROM初始化
 
 	initUI();
 
 	Sensor_Init();
 	DCMotor_Init();
 	StepMotor_Init();
+
+	//从EEPROM取数据
 
 	WDT_CONTR = 0x3F;//开看门狗，溢出时间1.1377s
 
@@ -74,27 +84,27 @@ void UITask(void) _task_ TASK_UI
     }  
 }
  
-//工作任务
-void teskTask(void) _task_ TASK_TEST  
-{  
-	while(1)
-	{	
-		LED2 = 1;              
-		os_wait(K_TMO, 200, 0);  //等待100个时钟滴答(ticks),即1s
-					 //配置文件ConfTny.A51中INT_CLOCK EQU 10000; default i s 10000 cycles
-					 //意思是时钟滴答为10000个机器周期。即10000*1uS=10ms			 
-		LED2 = 0;
-		os_wait(K_TMO, 200, 0);
-
-		//步进电机驱动测试
-		StepMotor_Test();
-
-		//直流电机驱动测试
-		DCMotor_Test();
-
-		//loopForever();
-    }  
-}  
+////工作任务
+//void teskTask(void) _task_ TASK_TEST  
+//{  
+//	while(1)
+//	{	
+//		LED2 = 1;              
+//		os_wait(K_TMO, 200, 0);  //等待100个时钟滴答(ticks),即1s
+//					 //配置文件ConfTny.A51中INT_CLOCK EQU 10000; default i s 10000 cycles
+//					 //意思是时钟滴答为10000个机器周期。即10000*1uS=10ms			 
+//		LED2 = 0;
+//		os_wait(K_TMO, 200, 0);
+//
+//		//步进电机驱动测试
+//		StepMotor_Test();
+//
+//		//直流电机驱动测试
+//		DCMotor_Test();
+//
+//		//loopForever();
+//    }  
+//}  
 
 //工程任务
 void projectTask(void) _task_ TASK_PROJECT//TASK_PROJECT
@@ -120,11 +130,13 @@ void homeTask(void) _task_ TASK_HOME   //TASK_HOME
 //校准任务
 void calibraTask(void) _task_ TASK_CALIBRA
 {
+	//cDebug("createTask : calibraProgram\n");
 	calibraProgram();
 	os_delete_task(TASK_CALIBRA);	//删除自己
 }
 
 void createTask(uint8_t task)
 {
+	//cDebug("createTask %d\n", (uint16_t)task);
 	os_create_task(task);
 }

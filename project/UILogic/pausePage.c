@@ -13,7 +13,7 @@ void pausePageButtonProcess(uint16 control_id, uint8  state)
 	case PAUSE_PREACTION_BUTTON:
 		{
 			if(pProjectMan->pCurJumptoAction-1 < &pProjectMan->pCurRunningProject->action[0])
-				pProjectMan->pCurJumptoAction = &pProjectMan->pCurRunningProject->action[ACTION_COUNT_PER_PROJECT-1];
+				pProjectMan->pCurJumptoAction = &pProjectMan->pCurRunningProject->action[ACTIONS_PER_PROJECT-1];
 			else
 				pProjectMan->pCurJumptoAction -= 1;
 
@@ -22,7 +22,7 @@ void pausePageButtonProcess(uint16 control_id, uint8  state)
 		break;
 	case PAUSE_POSTACTION_BUTTON:
 		{
-			if(pProjectMan->pCurJumptoAction+1 > &pProjectMan->pCurRunningProject->action[ACTION_COUNT_PER_PROJECT-1])
+			if(pProjectMan->pCurJumptoAction+1 > &pProjectMan->pCurRunningProject->action[ACTIONS_PER_PROJECT-1])
 				pProjectMan->pCurJumptoAction = &pProjectMan->pCurRunningProject->action[0];
 			else
 				pProjectMan->pCurJumptoAction += 1;

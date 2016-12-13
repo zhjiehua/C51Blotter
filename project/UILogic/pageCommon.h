@@ -222,7 +222,7 @@ extern "C" {
  * 下拉列表字符串声明
  */
 extern const char caliPumpMenuText[8][3];
-extern const char actionPumpMenuText[8][3];
+extern const char actionPumpMenuText[9][3];
 extern const char actionTipsMenuText[3][9];
 extern const char actionVoiceMenuText[4][7];
 extern const char actionSpeedMenuText[3][7];

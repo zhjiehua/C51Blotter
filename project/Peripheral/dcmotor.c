@@ -280,46 +280,46 @@ void DCMotor_Init(void)
     P_SW2 &= ~0x80;
 }
 
-void DCMotor_Test(void)
-{
-	if(pDCMotor->control == 0x01)
-	{
-		pSensor->SetCheckEdge(RASINGEDGE);
-	
-		pDCMotor->SetPos(1);
-		pDCMotor->SetSpeed(DCMOTOR1, 10);
-		pDCMotor->SetDir(DCMOTOR1, CW);
-		pDCMotor->SetCMD(DCMOTOR1, ENABLE);
-
-		while(!pDCMotor->IsOnPos())
-		{
-			if(pSensor->GetStatus(SENSOR_UP))
-				pDCMotor->UpdatePos();	
-		}
-		pDCMotor->SetCMD(DCMOTOR1, DISABLE);
-
-		//pDCMotor->WastePump_SetPos(UP);
-
-		pDCMotor->control = 0x00;
-	}
-	else if(pDCMotor->control == 0x02)
-	{
-		pSensor->SetCheckEdge(RASINGEDGE);
-	
-		pDCMotor->SetPos(1);
-		pDCMotor->SetSpeed(DCMOTOR1, 90);
-		pDCMotor->SetDir(DCMOTOR1, CW);
-		pDCMotor->SetCMD(DCMOTOR1, ENABLE);
-
-		while(!pDCMotor->IsOnPos())
-		{
-			if(pSensor->GetStatus(SENSOR_UP))
-				pDCMotor->UpdatePos();	
-		}
-		pDCMotor->SetCMD(DCMOTOR1, DISABLE);
-
-		//pDCMotor->WastePump_SetPos(DOWN);
-
-		pDCMotor->control = 0x00;
-	}			
-} 
+//void DCMotor_Test(void)
+//{
+//	if(pDCMotor->control == 0x01)
+//	{
+//		pSensor->SetCheckEdge(RASINGEDGE);
+//	
+//		pDCMotor->SetPos(1);
+//		pDCMotor->SetSpeed(DCMOTOR1, 10);
+//		pDCMotor->SetDir(DCMOTOR1, CW);
+//		pDCMotor->SetCMD(DCMOTOR1, ENABLE);
+//
+//		while(!pDCMotor->IsOnPos())
+//		{
+//			if(pSensor->GetStatus(SENSOR_UP))
+//				pDCMotor->UpdatePos();	
+//		}
+//		pDCMotor->SetCMD(DCMOTOR1, DISABLE);
+//
+//		//pDCMotor->WastePump_SetPos(UP);
+//
+//		pDCMotor->control = 0x00;
+//	}
+//	else if(pDCMotor->control == 0x02)
+//	{
+//		pSensor->SetCheckEdge(RASINGEDGE);
+//	
+//		pDCMotor->SetPos(1);
+//		pDCMotor->SetSpeed(DCMOTOR1, 90);
+//		pDCMotor->SetDir(DCMOTOR1, CW);
+//		pDCMotor->SetCMD(DCMOTOR1, ENABLE);
+//
+//		while(!pDCMotor->IsOnPos())
+//		{
+//			if(pSensor->GetStatus(SENSOR_UP))
+//				pDCMotor->UpdatePos();	
+//		}
+//		pDCMotor->SetCMD(DCMOTOR1, DISABLE);
+//
+//		//pDCMotor->WastePump_SetPos(DOWN);
+//
+//		pDCMotor->control = 0x00;
+//	}			
+//} 

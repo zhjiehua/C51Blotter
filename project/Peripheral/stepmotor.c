@@ -3,28 +3,15 @@
 #include "uart.h"
 #include "sensor.h"
 #include "stdlib.h"
+#include "../CPrintf.h"
 
 static StepMotor_TypeDef stepMotor;
 StepMotor_TypeDef *pStepMotor = &stepMotor;
 
-//const uint8_t AbsCoordinate[10] = 
-//{
-//	31,  // POS_PUMP1 = 
-//	30,	// POS_PUMP2 = 
-//	29,	// POS_PUMP3 = 
-//	28,	// POS_PUMP4 = 
-//	27,	// POS_PUMP5 = 
-//	26,	// POS_PUMP6 = 
-//	25,	// POS_PUMP7 = 
-//	24,	// POS_PUMP8 = 
-//
-//	3, //废液口 POS_WASTE = 
-//	8, //手动点 POS_HANDLE = 	
-//};
-
+//各重要点在转盘回原点后的绝对位置
 const uint8_t AbsCoordinate[10] = 
 {
-	20,  // POS_PUMP1 = 
+	20, // POS_PUMP1 = 
 	21,	// POS_PUMP2 = 
 	22,	// POS_PUMP3 = 
 	23,	// POS_PUMP4 = 
@@ -34,25 +21,8 @@ const uint8_t AbsCoordinate[10] =
 	27,	// POS_PUMP8 = 
 
 	48, //废液口 POS_WASTE = 
-	3, //手动点 POS_HANDLE = 	
+	3,  //手动点 POS_HANDLE = 	
 };
-
-////快速
-//const SpeedLevel_TypeDef speedLevel[] = {
-//	{F0R1, 5*SPEED_CONST},
-//	{F0R2, 5*SPEED_CONST},
-//	{F0R3, 7*SPEED_CONST},
-//	{F0R5, 7*SPEED_CONST},
-//	{F0R7, 10*SPEED_CONST},
-//	{F1R,  15*SPEED_CONST},
-//	{F1R3, 20*SPEED_CONST},
-//	{F1R6, 25*SPEED_CONST},
-//	{F2R,  30*SPEED_CONST},
-//	{F2R5, 40*SPEED_CONST},
-//	{F3R,  50*SPEED_CONST},
-//	{F3R5, 60*SPEED_CONST},
-//	{F4R,  70*SPEED_CONST},
-//};
 
 ////定位速度
 //const SpeedLevel_TypeDef speedLevel[] = {
@@ -193,10 +163,12 @@ static uint8_t StepMotor_IsStop(void)
 //转盘回原点
 static void StepMotor_Home(void)
 {
+	cDebug("Home\n");
+
 	pSensor->SetCheckEdge(FALLINGEDGE);
 
 	pStepMotor->SetPos(1);
-	pStepMotor->SetSpeed(8);  //第8级速度
+	pStepMotor->SetSpeed(SPEDD_HOME);  //第8级速度
 	pStepMotor->SetDir(CCW);
 	pStepMotor->SetCMD(ENABLE);
 
@@ -239,7 +211,7 @@ static void StepMotor_Position(Direction_TypeDef dir, uint8_t dis)
 	//
 	if(dis == 1)
 	{
-		pStepMotor->SetSpeed(2);  //第5级速度
+		pStepMotor->SetSpeed(SPEED_POSITION1);  //第5级速度
 		pStepMotor->SetPos(1);
 		pStepMotor->SetCMD(ENABLE);	
 		while(!pStepMotor->IsOnPos())
@@ -251,7 +223,7 @@ static void StepMotor_Position(Direction_TypeDef dir, uint8_t dis)
 	}
 	else if(dis == 2)
 	{
-		pStepMotor->SetSpeed(5);  //第8级速度
+		pStepMotor->SetSpeed(SPEED_POSITION2);  //第8级速度
 		pStepMotor->SetPos(1);
 		pStepMotor->SetCMD(ENABLE);	
 		while(!pStepMotor->IsOnPos())
@@ -271,7 +243,7 @@ static void StepMotor_Position(Direction_TypeDef dir, uint8_t dis)
 	}
 	else if(dis > 2)
 	{
-		pStepMotor->SetSpeed(8);  //第8级速度
+		pStepMotor->SetSpeed(SPEDD_POSITION);  //第8级速度
 		pStepMotor->SetPos(dis - 2);
 		pStepMotor->SetCMD(ENABLE);	
 		while(!pStepMotor->IsOnPos())
@@ -509,21 +481,21 @@ void tm1_isr() interrupt 3 using 3
 	TL1 = pStepMotor->pSpeedLevel[pStepMotor->curSpeedIndex].speed;
 }
 
-void StepMotor_Test(void)
-{
-	if(pStepMotor->control == 0x01) //启动定时器
-	{
-		pStepMotor->SetPos(1);
-		pSensor->SetCheckEdge(FALLINGEDGE);
-
-		//pStepMotor->SetTimer(ENABLE); //启动定时器1
-
-		while(!pStepMotor->IsOnPos())
-		{
-			if(pSensor->GetStatus(SENSOR_POS))
-				pStepMotor->UpdatePos();	
-		}
-		//pStepMotor->SetCMD(DISABLE);
-		pStepMotor->Stop();
-	}
-}
+//void StepMotor_Test(void)
+//{
+//	if(pStepMotor->control == 0x01) //启动定时器
+//	{
+//		pStepMotor->SetPos(1);
+//		pSensor->SetCheckEdge(FALLINGEDGE);
+//
+//		//pStepMotor->SetTimer(ENABLE); //启动定时器1
+//
+//		while(!pStepMotor->IsOnPos())
+//		{
+//			if(pSensor->GetStatus(SENSOR_POS))
+//				pStepMotor->UpdatePos();	
+//		}
+//		//pStepMotor->SetCMD(DISABLE);
+//		pStepMotor->Stop();
+//	}
+//}

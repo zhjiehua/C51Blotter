@@ -12,20 +12,20 @@
 extern "C" {
 #endif
 
-//uint8 cmd_buffer[CMD_MAX_SIZE];
-
-//#define TIME_100MS 10
-//
-//volatile uint32  timer_tick_count = 0; //定时器节拍
-//
-//uint8 cmd_buffer[CMD_MAX_SIZE];
-//
-//static int32 test_value = 0;
-//static uint8 update_en = 0;
-//
-//void UpdateUI(void);
-
 #if 0
+
+uint8 cmd_buffer[CMD_MAX_SIZE];
+
+#define TIME_100MS 10
+
+volatile uint32  timer_tick_count = 0; //定时器节拍
+
+uint8 cmd_buffer[CMD_MAX_SIZE];
+
+static int32 test_value = 0;
+static uint8 update_en = 0;
+
+void UpdateUI(void);
 
 //程序入口
 int main()
@@ -203,7 +203,7 @@ void SetTextValueFloat(uint16 screen_id, uint16 control_id, float value)
 //字符串转整数
 float StringToFloat(uint8 *str)
 {
-	int32 v = 0;
+	float v = 0;
 	sscanf((char *)str,"%lf",&v);
 	return v;
 }
@@ -313,7 +313,13 @@ void NotifyText(uint16 screen_id, uint16 control_id, uint8 *str)
 		case ACTIONPAGE_INDEX:
 			actionPageEditProcess(control_id, str);
 			break;
-		
+		case PROJECTEDITPAGE_INDEX:
+			projectEditPageEditProcess(control_id, str);
+			break;
+		case CALIBRATIONPAGE_INDEX:
+			caliPageEditProcess(control_id, str);
+			break;
+
 		default:
 			cDebug("cmd_process NotifyText error!\n");
 		break;

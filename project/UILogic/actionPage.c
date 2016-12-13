@@ -1,6 +1,7 @@
 #include "pageCommon.h"
 #include "managerment.h"
 #include "CPrintf.h"
+#include "./Peripheral/24cxx.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -8,6 +9,7 @@ extern "C" {
 
 void actionPageButtonProcess(uint16 control_id, uint8  state)
 {
+	uint16_t addrOffset;
 	switch(control_id)
 	{
 		case ACTEDIT_SAVE_BUTTON:
@@ -23,6 +25,9 @@ void actionPageButtonProcess(uint16 control_id, uint8  state)
 			pProjectMan->pCurEditAction->shakeTime.minute = pProjectMan->shakeTime.minute;
 			pProjectMan->pCurEditAction->loopTime = pProjectMan->loopTime;
 			cDebug("========actionPage Save the ACTION data!\n");
+
+			addrOffset = pProjectMan->pCurEditProject->index*PROJECT_SIZE + (pProjectMan->pCurEditAction->index)*ACTION_SIZE;
+			AT24CXX_Write(PROJECT_BASEADDR+addrOffset, (uint8_t*)pProjectMan->pCurEditAction, ACTION_SIZE-NAME_SIZE);  //±£´æ²ÎÊý
 		}
 		break;
 		case ACTEDIT_PUMPSEL_BUTTON:

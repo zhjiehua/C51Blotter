@@ -168,7 +168,7 @@ void Uart2_Isr() interrupt 8 using 3   //RTX定时中断用了1
 #if 1
 		//queue_push(Buf);
 
-		//调用上面的push函数有问题
+		//调用上面的push函数有问题，应该是函数不可重入的问题
 		pos = (que._head+1)%QUEUE_MAX_SIZE;
 		if(pos!=que._tail)//非满状态
 		{

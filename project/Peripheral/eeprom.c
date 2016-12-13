@@ -128,3 +128,24 @@ Error:
     P1 &= 0x7f;                     //0xxx,xxxx IAP operation fail
     while (1);
 */
+
+void IAP_ReadProject(uint8_t index)
+{
+	uint16_t address;
+	switch(index)
+	{
+		case 0:
+			address = IAP_PROJECT0_ADDRESS;
+			break;
+		case 1:
+			address = IAP_PROJECT1_ADDRESS;
+			break;
+		case 2:
+			address = IAP_PROJECT2_ADDRESS;
+			break;
+		default:
+			break;	
+	}
+	
+}
+

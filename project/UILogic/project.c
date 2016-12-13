@@ -28,7 +28,7 @@ const char caliPumpMenuText[8][3] = {
 /************************************************************************/
 /* 动作编辑页面下拉列表字符串                                             */
 /************************************************************************/
-const char actionPumpMenuText[8][3] = {
+const char actionPumpMenuText[9][3] = {
 	"1",
 	"2",
 	"3",
@@ -37,6 +37,7 @@ const char actionPumpMenuText[8][3] = {
 	"6",
 	"7",
 	"8",
+	"0",
 };
 
 const char actionTipsMenuText[3][9] = {
@@ -70,25 +71,28 @@ const Action_TypeDef actionDemo = {
 	SLOW_SPEED,
 	{0, 1},
 	1,
+	1,
 	"action0"
 };
 
 //定义12个项目
-Project_TypeDef project[PROJECT_COUNT];
+//Project_TypeDef project[PROJECT_COUNT];
+Project_TypeDef project[1];
 
 //定义蠕动泵校准参数列表
 float caliPumpPara[PUMP_COUNT];
 
 //初始化项目结构体
-void initProjectStruct(Project_TypeDef* pro, char *name)
+void initProjectStruct(Project_TypeDef* pro, uint8 index, uint8 *name)
 {
 	uint16 i;
 	char str[NAME_SIZE];
 
 	memset(pro->name, '\0', NAME_SIZE);
-	memcpy(pro->name, name, NAME_SIZE);
+	memcpy(pro->name, name, NAME_SIZE);	//修改项目名
+	pro->index = index;
 
-	for(i=0;i<ACTION_COUNT_PER_PROJECT;i++)
+	for(i=0;i<ACTIONS_PER_PROJECT;i++)
 	{
 		memset(str, '\0', NAME_SIZE);
 		memset(pro->action[i].name, '\0', NAME_SIZE);
@@ -96,7 +100,8 @@ void initProjectStruct(Project_TypeDef* pro, char *name)
 
 		memcpy((void *)(&(pro->action[i])), (void *)(&actionDemo), sizeof(actionDemo));
 
-		memcpy(pro->action[i].name, str, NAME_SIZE);
+		memcpy(pro->action[i].name, str, NAME_SIZE);  //修改动作名
+		pro->action[i].index = i;//修改序号
 	}
 }
 
@@ -179,7 +184,7 @@ void fillTube(void)
 			pDCMotor->SetSpeed(i, 10);
 			pDCMotor->SetCMD(i, ENABLE);				
 			os_wait(K_TMO, 6000, 0);
-			os_wait(K_TMO, 6000, 0);	
+			os_wait(K_TMO, 6000, 0);				
 			pDCMotor->SetCMD(i, DISABLE);
 
 			while(1)
@@ -409,16 +414,16 @@ void incubation(void)
 		switch(pProjectMan->pCurRunningAction->shakeSpeed)
 		{
 			case 0:	 //慢
-				pStepMotor->SetSpeed(5);
+				pStepMotor->SetSpeed(SPEDD_SLOW);
 			break;
 			case 1:	 //中
-				pStepMotor->SetSpeed(9);
+				pStepMotor->SetSpeed(SPEDD_MIDDLE);
 			break;
 			case 2:	 //快
-				pStepMotor->SetSpeed(13);
+				pStepMotor->SetSpeed(SPEDD_FAST);
 			break;
 			default: //默认
-				pStepMotor->SetSpeed(5);
+				pStepMotor->SetSpeed(SPEDD_SLOW);
 			break;
 		}
 
@@ -463,16 +468,16 @@ void incubation(void)
 				switch(pProjectMan->pCurRunningAction->shakeSpeed)
 				{
 					case 0:	 //慢
-						pStepMotor->SetSpeed(5);
+						pStepMotor->SetSpeed(SPEDD_SLOW);
 					break;
 					case 1:	 //中
-						pStepMotor->SetSpeed(9);
+						pStepMotor->SetSpeed(SPEDD_MIDDLE);
 					break;
 					case 2:	 //快
-						pStepMotor->SetSpeed(13);
+						pStepMotor->SetSpeed(SPEDD_FAST);
 					break;
 					default: //默认
-						pStepMotor->SetSpeed(5);
+						pStepMotor->SetSpeed(SPEDD_SLOW);
 					break;
 				}
 
@@ -546,7 +551,7 @@ void projectProgram(void)
 	SetTextValue(RUNNINGPAGE_INDEX, RUNNING_STATUS_EDIT, "Preparation finish");
 
 	//执行动作
-	for(i=0;i<ACTION_COUNT_PER_PROJECT;i++)
+	for(i=0;i<ACTIONS_PER_PROJECT;i++)
 	{
 		if(pProjectMan->jumpTo == 1)
 		{
@@ -798,7 +803,23 @@ void homeProgram(void)
 /****************************************************************************************/
 void calibraProgram(void)
 {
-	;
+	uint8_t i;
+	float time = 4.0*pProjectMan->pCaliPumpPara[pProjectMan->caliPumpSel];
+	//cDebug("========caliPage start to run the PUMP program!\n");
+
+//	cDebug("pProjectMan->caliPumpSel = %d\n", (uint16_t)pProjectMan->caliPumpSel);
+//	pDCMotor->SetCMD(pProjectMan->caliPumpSel, ENABLE);
+//	os_wait(K_TMO, 1000, 0);
+//	pDCMotor->SetCMD(pProjectMan->caliPumpSel, DISABLE);
+
+	//直流电机运行40次
+	for(i=0;i<20;i++)
+	{
+		pDCMotor->SetCMD(pProjectMan->caliPumpSel, ENABLE);
+		os_wait(K_TMO, 150*time, 0);
+		pDCMotor->SetCMD(pProjectMan->caliPumpSel, DISABLE);
+		os_wait(K_TMO, 50, 0);
+	}
 }
 
 #ifdef __cplusplus

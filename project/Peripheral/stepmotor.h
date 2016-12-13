@@ -26,6 +26,14 @@ sbit S_STEP2 = P3^4;
 
 #define SPEED_CONST  600 //用于加减速的步进时间常数
 
+#define SPEED_POSITION1 2  //定位距离为1的速度
+#define SPEED_POSITION2 5  //定位距离为2的速度
+#define SPEDD_POSITION  8  //定位距离大于3的速度
+#define SPEDD_HOME	    8  //回原点的速度
+#define SPEDD_SLOW	    5  //孵育速度-慢
+#define SPEDD_MIDDLE    9  //孵育速度-中
+#define SPEDD_FAST	    13 //孵育速度-快
+
 #define TANK_COUNT 50
 #define TANK_PER_PLATE 5
 

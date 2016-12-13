@@ -3,7 +3,7 @@
 
 #include "common.h"
 
-#define BAUD 38400           //UART baudrate
+#define BAUD 38400          //UART baudrate
 
 /*Define UART parity mode*/
 #define NONE_PARITY     0   //None parity

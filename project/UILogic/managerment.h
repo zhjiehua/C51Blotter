@@ -116,9 +116,6 @@ typedef struct
 
 	TipsButton_TypeDef tipsButton;  //提示页面的按钮状态
 	RunningType_TypeDef runningType;  //正在运行的类型
-
-//	ProjectStatus_TypeDef proStatus;  //项目的动作流程
-//	ProjectStatus_TypeDef preProStatus;  //项目的动作流程
 }ProjectMan_TypeDef;
 
 /************************************************************************/
@@ -132,7 +129,7 @@ void initProjectMan(ProjectMan_TypeDef *pm);
 void initUI(void);
 
 //void uartInterrupt(uint8 data);
-void loopForever(void);
+//void loopForever(void);
 
 #ifdef __cplusplus
 }

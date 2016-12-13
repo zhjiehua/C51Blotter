@@ -12,6 +12,10 @@
 	0x2E00~0x2FFF      512Byte   	sector8
 */
 
+/*STC15F4K56S只有2KByte的EEPROM
+  IAP功能读地址从0x0000~0x07FF
+*/
+
 #ifndef __EEPROM_H__
 #define __EEPROM_H__
 
@@ -39,7 +43,12 @@ typedef unsigned int WORD;
 //#define ENABLE_IAP 0x83           //if SYSCLK<5MHz
 
 //Start address for STC89C52xx EEPROM
-#define IAP_ADDRESS 0x2000
+//#define IAP_ADDRESS 0x2000
+
+#define IAP_MANAGERMENT      0x0000
+#define IAP_PROJECT0_ADDRESS 0x0200
+#define IAP_PROJECT1_ADDRESS 0x0400
+#define IAP_PROJECT2_ADDRESS 0x0600
 
 void Delay(BYTE n);
 void IapIdle();

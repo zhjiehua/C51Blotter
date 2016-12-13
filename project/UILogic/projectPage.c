@@ -1,6 +1,7 @@
 #include "pageCommon.h"
 #include "managerment.h"
 #include "CPrintf.h"
+#include "./Peripheral/24cxx.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -12,20 +13,36 @@ void projectPageButtonProcess(uint16 control_id, uint8  state)
 	{
 		case PRO_POSTPROJECT_BUTTON:
 		{
-			if(pProjectMan->pCurProject+1 > &project[PROJECT_COUNT-1])
-				pProjectMan->pCurProject = &project[0];
+//			if(pProjectMan->pCurProject+1 > &project[PROJECT_COUNT-1])
+//				pProjectMan->pCurProject = &project[0];
+//			else
+//				pProjectMan->pCurProject += 1;
+
+			//从EEPROM读取项目数据
+			uint16_t addrOffset;
+			if(pProjectMan->pCurProject->index == PROJECT_COUNT-1)
+				addrOffset = 0;  //读出第一个项目参数
 			else
-				pProjectMan->pCurProject += 1;
+				addrOffset = pProjectMan->pCurProject->index+1;
+			AT24CXX_Read(PROJECT_BASEADDR+addrOffset*PROJECT_SIZE, (uint8_t*)project, PROJECT_SIZE);  //读出下一个项目参数			
 
 			SetTextValue(PROJECTPAGE_INDEX, PRO_PROJECTNAME_EDIT, pProjectMan->pCurProject->name);
 		}
 		break;
 		case PRO_PREPROJECT_BUTTON:
 		{
-			if(pProjectMan->pCurProject-1 < &project[0])
-				pProjectMan->pCurProject = &project[PROJECT_COUNT-1];
+//			if(pProjectMan->pCurProject-1 < &project[0])
+//				pProjectMan->pCurProject = &project[PROJECT_COUNT-1];
+//			else
+//				pProjectMan->pCurProject -= 1;
+
+			//从EEPROM读取项目数据
+			uint16_t addrOffset;
+			if(pProjectMan->pCurProject->index == 0)
+				addrOffset = PROJECT_COUNT-1;  //读出第一个项目参数
 			else
-				pProjectMan->pCurProject -= 1;
+				addrOffset = pProjectMan->pCurProject->index-1;
+			AT24CXX_Read(PROJECT_BASEADDR+addrOffset*PROJECT_SIZE, (uint8_t*)project, PROJECT_SIZE);  //读出上一个项目参数
 
 			SetTextValue(PROJECTPAGE_INDEX, PRO_PROJECTNAME_EDIT, pProjectMan->pCurProject->name);
 		}
