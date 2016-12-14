@@ -7,6 +7,8 @@ void IO_Init(void)
 {
 	P0M1 = 0x0F;    //˫˫˫˫�߸߸߸�
 	P0M0 = 0x00;
+//	P0M1 = 0x0F;    //˫˫˫˫�߸߸߸�
+//	P0M0 = 0xE0;
 	P0 = 0xFF;    //EN_MOT06,EN_MOT05,EN_MOT04,EN_MOT01,EAIN8,EAIN7,EAIN6,EAIN5
 	//----------------------
 	P1M1 = 0x00;    //˫˫˫˫˫˫˫˫
@@ -65,7 +67,7 @@ void IO_Init(void)
  *		 	   1:����5��
  */
 void beepAlarm(unsigned char time)
-{
+{									   
 	if(time == 0)
 		DRV_BEEP = 1;  //һֱ��
 	else

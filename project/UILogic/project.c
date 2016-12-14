@@ -567,8 +567,8 @@ void projectProgram(void)
 		SetTextValueInt32(RUNNINGPAGE_INDEX, RUNNING_IMBITANK_EDIT, 0);
 		SetTextValueInt32(RUNNINGPAGE_INDEX, RUNNING_LOOPTIME_EDIT, 1);
 		SetTextValueInt32(RUNNINGPAGE_INDEX, RUNNING_TOTALLOOPTIME_EDIT, pProjectMan->pCurRunningAction->loopTime);
-		rtcTime = pProjectMan->pCurProject->action[0].shakeTime.hour*3600
-					+ pProjectMan->pCurProject->action[0].shakeTime.minute*60;
+		rtcTime = pProjectMan->pCurProject->action[i].shakeTime.hour*3600
+					+ pProjectMan->pCurProject->action[i].shakeTime.minute*60;
 		SeTimer(RUNNINGPAGE_INDEX, RUNNING_TIME_RTC, rtcTime);
 
 		for(pProjectMan->curLoopTime=1;pProjectMan->curLoopTime<=pProjectMan->pCurRunningAction->loopTime;pProjectMan->curLoopTime++)
@@ -660,6 +660,7 @@ void purgeProgram(void)
 	}
 
 	SetControlVisiable(PURGEPAGE_INDEX, PURGE_START_BUTTON, 0);
+	SetControlVisiable(PURGEPAGE_INDEX, PURGE_START_BUTTON, 0);
 	SetControlEnable(PURGEPAGE_INDEX, PURGE_PUMP1_BUTTON, 0);
 	SetControlEnable(PURGEPAGE_INDEX, PURGE_PUMP2_BUTTON, 0);
 	SetControlEnable(PURGEPAGE_INDEX, PURGE_PUMP3_BUTTON, 0);
@@ -706,7 +707,7 @@ void purgeProgram(void)
 
 			//将废液槽转到对应的泵位置
 			relCoord = pStepMotor->Abs2Rel(AbsCoordinate[i]);
-			pStepMotor->RelativePosition(relCoord, AbsCoordinate[9]); //AbsCoordinate[8]为废液槽
+			pStepMotor->RelativePosition(relCoord, AbsCoordinate[9]); //AbsCoordinate[8]为废液口
 
 			pDCMotor->SetSpeed(i, 10);
 			pDCMotor->SetCMD(i, ENABLE);				
@@ -820,6 +821,9 @@ void calibraProgram(void)
 		pDCMotor->SetCMD(pProjectMan->caliPumpSel, DISABLE);
 		os_wait(K_TMO, 50, 0);
 	}
+
+	SetControlEnable(CALIBRATIONPAGE_INDEX, CALI_PUMPSELECT_BUTTON, 1);
+	SetControlEnable(CALIBRATIONPAGE_INDEX, CALI_START_BUTTON, 1);
 }
 
 #ifdef __cplusplus

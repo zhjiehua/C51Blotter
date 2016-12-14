@@ -17,6 +17,9 @@ void caliPageButtonProcess(uint16 control_id, uint8  state)
 		{
 			cDebug("========caliPage start to run the PUMP program!\n");
 
+			SetControlEnable(CALIBRATIONPAGE_INDEX, CALI_PUMPSELECT_BUTTON, 0);
+			SetControlEnable(CALIBRATIONPAGE_INDEX, CALI_START_BUTTON, 0);
+
 			createTask(TASK_CALIBRA);
 		}
 		break;

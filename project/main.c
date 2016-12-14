@@ -45,6 +45,8 @@ void startupTask(void) _task_ TASK_STARTUP
 	//cDebug("hello 51 MCU\n");
 	Uart_SendData(0xA5);
 
+	DRV_DELAY = 1;
+
 	//---------------创建任务-----------------------------
 	os_create_task(TASK_UI); 	//创建任务1
 	//os_create_task(TASK_HOME);	//创建任务2   TASK_HOME
