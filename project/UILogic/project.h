@@ -17,11 +17,14 @@ extern "C" {
 #define ACTION_SIZE		   sizeof(Action_TypeDef)
 #define PROJECT_SIZE       (ACTION_SIZE*ACTIONS_PER_PROJECT + NAME_SIZE + 1) 
 #define CALIBPARA_SIZE     (sizeof(float)*PUMP_COUNT)
+#define LANGUAGE_SIZE      (1)
+#define POSCALI_SIZE       (4)
 //EEPROM地址分配
 #define RESET_DEFAULT	   6
 #define CALIBPARA_BASEADDR (RESET_DEFAULT+4)
-#define PROJECT_BASEADDR   (CALIBPARA_BASEADDR + CALIBPARA_SIZE) 
-
+#define LANGUAGE_BASEADDR  (CALIBPARA_BASEADDR + CALIBPARA_SIZE)
+#define PROJECT_BASEADDR   (LANGUAGE_BASEADDR + LANGUAGE_SIZE)
+#define POSCALI_BASEADDR   (PROJECT_BASEADDR + PROJECT_SIZE*PROJECT_COUNT)
 
 typedef enum
 {
@@ -72,7 +75,7 @@ typedef struct
 	Pump_TypeDef pump;  //泵编号
 	Tips_TypeDef tips;  //提示
 	Voice_TypeDef voice;  //声音
-	float addAmount;  //加注量
+	uint8 addAmount;  //加注量
 	uint8 imbiAmount;  //吸液量
 	ShakeSpeed_TypeDef shakeSpeed;  //摇动速度
 	ShakeTime_TypeDef shakeTime;  //摇动时间

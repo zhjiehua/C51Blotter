@@ -125,6 +125,14 @@ void purgeTask(void) _task_ TASK_PURGE
 //回原点任务
 void homeTask(void) _task_ TASK_HOME   //TASK_HOME
 {
+	//SetScreen(MAINPAGE_INDEX);
+	//SetScreen(TIPS0PAGE_INDEX);
+
+	if(pProjectMan->lang == 0)
+		SetTextValue(LOGOPAGE_INDEX, LOGO_STATUS_EDIT, "System initializing……");
+	else
+		SetTextValue(LOGOPAGE_INDEX, LOGO_STATUS_EDIT, "系统初始化中……");
+
 	homeProgram();
 	os_delete_task(TASK_HOME);	//删除自己
 }

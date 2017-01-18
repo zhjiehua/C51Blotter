@@ -45,14 +45,21 @@ void mainPageButtonProcess(uint16 control_id, uint8  state)
 			BatchEnd();
 			break;
 		case MAIN_CALI_BUTTON:
-			SetTextValue(CALIBRATIONPAGE_INDEX, CALI_PUMPSELECT_EDIT, caliPumpMenuText[pProjectMan->caliPumpSel]);
-			SetTextValueFloat(CALIBRATIONPAGE_INDEX, CALI_ACTUALAMOUNT_EDIT, pProjectMan->pCaliPumpPara[pProjectMan->caliPumpSel]);
-			//SetTextFloat(CALIBRATIONPAGE_INDEX, CALI_ACTUALAMOUNT_EDIT, pProjectMan->pCaliPumpPara[pProjectMan->caliPumpSel], 1, 1);
-
 			pProjectMan->caliAmount = pProjectMan->pCaliPumpPara[pProjectMan->caliPumpSel];
+			SetTextValue(CALIBRATIONPAGE_INDEX, CALI_PUMPSELECT_EDIT, caliPumpMenuText[pProjectMan->caliPumpSel]);
+			SetTextValueInt32(CALIBRATIONPAGE_INDEX, CALI_ACTUALAMOUNT_EDIT, pProjectMan->caliAmount*10);
+			//SetTextFloat(CALIBRATIONPAGE_INDEX, CALI_ACTUALAMOUNT_EDIT, pProjectMan->pCaliPumpPara[pProjectMan->caliPumpSel], 1, 1);
 			break;
 		case MAIN_INFO_BUTTON:
 			SetTextValue(INFORMATIONPAGE_INDEX, INFO_VERSION_EDIT, VERSION);
+			if(pProjectMan->lang == 0)
+				SetTextValue(INFORMATIONPAGE_INDEX, INFO_LANG_EDIT, langMenuText[pProjectMan->lang]);
+			else
+				SetTextValue(INFORMATIONPAGE_INDEX, INFO_LANG_EDIT, langMenuTextCh[pProjectMan->lang]);
+
+			SetTextValueInt32(INFORMATIONPAGE_INDEX, INFO_POSCALI1_EDIT, pProjectMan->posCali1);
+			SetTextValueInt32(INFORMATIONPAGE_INDEX, INFO_POSCALI2_EDIT, pProjectMan->posCali2);
+
 			break;
 		default:
 			cDebug("mainPage BUTTON error!\n");

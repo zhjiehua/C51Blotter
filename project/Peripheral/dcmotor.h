@@ -32,6 +32,7 @@ sbit MOT10_DIR = P3^6;
 
 #define PUMP_VACUUM DCMOTOR9   //Õæ¿Õ±Ã
 #define PUMP_WASTE  DCMOTOR10  //·ÏÒº±Ã
+#define PUMP_PINCH  DCMOTOR12  //¼Ð¹Ü·§
 
 typedef enum
 {

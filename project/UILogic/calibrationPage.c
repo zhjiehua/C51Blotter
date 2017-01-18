@@ -29,7 +29,7 @@ void caliPageButtonProcess(uint16 control_id, uint8  state)
 			uint16_t addrOffset;
 			pProjectMan->pCaliPumpPara[pProjectMan->caliPumpSel] = pProjectMan->caliAmount;
 			addrOffset = pProjectMan->caliPumpSel*sizeof(float);
-			AT24CXX_Write(CALIBPARA_BASEADDR+addrOffset, (uint8_t*)&pProjectMan->caliAmount, sizeof(float));  //保存参数
+			AT24CXX_Write(CALIBPARA_BASEADDR+addrOffset, (uint8_t*)&(pProjectMan->pCaliPumpPara[pProjectMan->caliPumpSel]), sizeof(float));  //保存参数
 			cDebug("========caliPage Save the calibration data!\n");
 		}
 		break;
@@ -45,10 +45,12 @@ void caliPageButtonProcess(uint16 control_id, uint8  state)
 
 void caliPageEditProcess(uint16 control_id, uint8 *str)
 {
+	uint16_t temp;
 	switch(control_id)
 	{
 		case CALI_ACTUALAMOUNT_EDIT:
-			pProjectMan->caliAmount = StringToFloat(str);
+			temp = StringToInt32(str);
+			pProjectMan->caliAmount = (float)temp/10.0;
 			cDebug("pProjectMan->caliAmount = %f\n", pProjectMan->caliAmount);
 		break;
 

@@ -6,6 +6,7 @@
 #include "../Peripheral/stepmotor.h"
 #include "../Peripheral/io.h"
 #include "../Peripheral/24cxx.h"
+#include "../HMI/hmi_driver.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -55,7 +56,7 @@ void initProjectMan(ProjectMan_TypeDef *pm)
 /************************************************************************/
 uint8 cmd_buffer[CMD_MAX_SIZE];
 
-#define EEPROM_DEFAULT 0x11223346
+#define EEPROM_DEFAULT 0x11223345
 
 void initUI(void)
 {
@@ -65,14 +66,32 @@ void initUI(void)
 	uint32 j;
 	uint32_t dat;
 
-	AT24CXX_Read(RESET_DEFAULT, (uint8_t*)(&dat), sizeof(uint32_t));//是否第一次开机
+	AT24CXX_Read(RESET_DEFAULT, (uint8_t*)(&dat), sizeof(uint32_t));//是否第一次开机，读3次
+	if(dat != EEPROM_DEFAULT)
+		AT24CXX_Read(RESET_DEFAULT, (uint8_t*)(&dat), sizeof(uint32_t));
+	if(dat != EEPROM_DEFAULT)
+		AT24CXX_Read(RESET_DEFAULT, (uint8_t*)(&dat), sizeof(uint32_t));
 	if(dat != EEPROM_DEFAULT) //是，初始化EEPROM中的数据
 	{
 		cDebug("RESET_DEFAULT\n");
 
+		pProjectMan->lang = 0;
+		AT24CXX_Write(LANGUAGE_BASEADDR, (uint8_t*)(&pProjectMan->lang), LANGUAGE_SIZE);
+
+		SetScreen(TIPS0PAGE_INDEX);//跳转到提示0页面
+		//if(pProjectMan->lang == 0)
+			SetTextValue(TIPS0PAGE_INDEX, TIPS0_TIPS_EDIT, "Restore factory settings……");
+		//else
+		//	SetTextValue(TIPS0PAGE_INDEX, TIPS0_TIPS_EDIT, "正在恢复出厂设置……");
+
 		//初始化校准参数
 		initCaliPumpPara(4.0);
 		AT24CXX_Write(CALIBPARA_BASEADDR, (uint8_t*)caliPumpPara, CALIBPARA_SIZE);
+
+		//初始化位置校准参数
+		pProjectMan->posCali1 = STEPMOTOR_OFFSET;
+		pProjectMan->posCali2 = STEPMOTOR_PUMP_OFFSET;
+		AT24CXX_Write(POSCALI_BASEADDR, (uint8_t*)(&pProjectMan->posCali1), POSCALI_SIZE);
 
 		//初始化项目参数
 		for(i=PROJECT_COUNT-1;i>=0;i--)
@@ -89,18 +108,46 @@ void initUI(void)
 		
 		dat = EEPROM_DEFAULT;
 		AT24CXX_Write(RESET_DEFAULT, (uint8_t*)&dat, sizeof(uint32_t));	
+
+		SetScreen(LOGOPAGE_INDEX);//跳转到LOGO页面
 	}
 	else //否，从EEPROM中读取数据
 	{
 		cDebug("read data from EEPROM\n");
+		
+//		//初始化位置校准参数
+//		pProjectMan->posCali1 = STEPMOTOR_OFFSET;
+//		pProjectMan->posCali2 = STEPMOTOR_PUMP_OFFSET;
+//		AT24CXX_Write(POSCALI_BASEADDR, (uint8_t*)(&pProjectMan->posCali1), POSCALI_SIZE);
+
+		AT24CXX_Read(LANGUAGE_BASEADDR, (uint8_t*)(&pProjectMan->lang), LANGUAGE_SIZE); //读出语言参数
+
+		if(pProjectMan->lang == 0)
+		{
+			SetTextValue(LOGOPAGE_INDEX, LOGO_STATUS_EDIT, "System initializing……");
+		}
+		else
+			SetTextValue(LOGOPAGE_INDEX, LOGO_STATUS_EDIT, "系统初始化中……");
+
 		AT24CXX_Read(CALIBPARA_BASEADDR, (uint8_t*)caliPumpPara, CALIBPARA_SIZE); //读出校准参数
+
+		AT24CXX_Read(POSCALI_BASEADDR, (uint8_t*)&pProjectMan->posCali1, POSCALI_SIZE);  //读出位置校准参数
+
 //		for(i=0;i<PUMP_COUNT;i++)
 //			cDebug("caliPumpPara[%d] = %f\n", i, caliPumpPara[i]);
-		AT24CXX_Read(PROJECT_BASEADDR + PROJECT_SIZE, (uint8_t*)&project[0], PROJECT_SIZE);  //读出第一个项目参数
+		//AT24CXX_Read(PROJECT_BASEADDR + PROJECT_SIZE, (uint8_t*)&project[0], PROJECT_SIZE);  //读出第一个项目参数
+		AT24CXX_Read(PROJECT_BASEADDR, (uint8_t*)&project[0], PROJECT_SIZE);  //读出第一个项目参数
+		
 		//cDebug("PROJECT_SIZE = %d\n", PROJECT_SIZE);
 		cDebug("project[0].name = %s\n", project[0].name);
 		cDebug("project[0].index = %d\n", (uint16_t)project[0].index);	
 	}
+
+   	//设置语言
+	if(pProjectMan->lang == 0)
+		SetLanguage(0, 1);
+	else
+		SetLanguage(1, 0);
 
 	//初始化项目管理结构体
 	initProjectMan(pProjectMan);

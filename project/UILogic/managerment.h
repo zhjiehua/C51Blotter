@@ -55,6 +55,12 @@ typedef enum
 
 typedef enum
 {
+	English = 0,
+	Chinese,
+}Language_TypeDef;
+
+typedef enum
+{
 	PROJECTSTATUS_IDLE,
 	PROJECTSTATUS_SELECTPUMP,
 	PROJECTSTATUS_FILLING,
@@ -102,7 +108,7 @@ typedef struct
 	Pump_TypeDef pump;//泵编号
 	Tips_TypeDef tips;//提示
 	Voice_TypeDef voice;//声音
-	float addAmount;//加注量
+	uint8 addAmount;//加注量
 	uint8 imbiAmount;//吸液量
 	ShakeSpeed_TypeDef shakeSpeed;//摇动速度
 	ShakeTime_TypeDef shakeTime;//摇动时间
@@ -116,6 +122,10 @@ typedef struct
 
 	TipsButton_TypeDef tipsButton;  //提示页面的按钮状态
 	RunningType_TypeDef runningType;  //正在运行的类型
+
+	Language_TypeDef lang;
+	uint16 posCali1; //废液口位置校准参数
+	uint16 posCali2; //蠕动泵位置校准参数
 }ProjectMan_TypeDef;
 
 /************************************************************************/

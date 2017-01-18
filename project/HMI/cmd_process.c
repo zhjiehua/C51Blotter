@@ -270,6 +270,7 @@ void NotifyButton(uint16 screen_id, uint16 control_id, uint8  state)
 			caliPageButtonProcess(control_id, state);
 			break;
 		case INFORMATIONPAGE_INDEX:
+			infoPageButtonProcess(control_id, state);
 			break;
 		case ACTIONPAGE_INDEX:
 			actionPageButtonProcess(control_id, state);
@@ -319,7 +320,9 @@ void NotifyText(uint16 screen_id, uint16 control_id, uint8 *str)
 		case CALIBRATIONPAGE_INDEX:
 			caliPageEditProcess(control_id, str);
 			break;
-
+		case INFORMATIONPAGE_INDEX:
+			infoPageEditProcess(control_id, str);
+			break;
 		default:
 			cDebug("cmd_process NotifyText error!\n");
 		break;
@@ -383,6 +386,9 @@ void NotifyMenu(uint16 screen_id, uint16 control_id, uint8  item, uint8  state)
 		break;
 		case ACTIONPAGE_INDEX:
 			actionPageMenuProcess(control_id, item);
+			break;
+		case INFORMATIONPAGE_INDEX:
+			infoPageMenuProcess(control_id, item);
 			break;
 		default:
 			cDebug("cmd_process NotifyMenu error!\n");

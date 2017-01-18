@@ -30,6 +30,12 @@ extern "C" {
 #define TIPS2PAGE_INDEX					14
 
 /************************************************************************/
+/* LOGO页面控件ID                                                         */
+/************************************************************************/
+#define LOGO_START_BUTTON				1
+#define LOGO_STATUS_EDIT				2
+
+/************************************************************************/
 /* 主页面控件ID                                                         */
 /************************************************************************/
 #define MAIN_PROJECT_BUTTON				1
@@ -106,6 +112,11 @@ extern "C" {
 /* 信息页面控件ID	                                                    */
 /************************************************************************/
 #define INFO_VERSION_EDIT				1
+#define INFO_LANG_EDIT					2
+#define INFO_LANG_BUTTON				3
+#define INFO_LANG_MENU					4
+#define INFO_POSCALI1_EDIT				5
+#define INFO_POSCALI2_EDIT				6
 #define INFO_BACK_BUTTON				50
 
 /************************************************************************/
@@ -211,22 +222,19 @@ extern "C" {
 #define PANEL_VERSION					"9.1.7"
 #define VERSION							"0.1.0"
 
-/************************************************************************/
-/* 提示                                                                 */
-/************************************************************************/
-#define PAUSE_TIPS "Are you really want to PAUSE the program?"
-#define STOP_TIPS "Are you really want to STOP the program?"
-#define FILLTUBE_TIPS "Whether fill the tube?"
-
 /*
  * 下拉列表字符串声明
  */
 extern const char caliPumpMenuText[8][3];
 extern const char actionPumpMenuText[9][3];
 extern const char actionTipsMenuText[3][9];
+extern const char actionTipsMenuTextCh[3][5];
 extern const char actionVoiceMenuText[4][7];
+extern const char actionVoiceMenuTextCh[4][3];
 extern const char actionSpeedMenuText[3][7];
-
+extern const char actionSpeedMenuTextCh[3][5];
+extern const char langMenuText[2][8];
+extern const char langMenuTextCh[2][5];
 /*
  * 函数声明
  */
@@ -248,6 +256,10 @@ void purgePageButtonProcess(uint16 control_id, uint8  state);
 void caliPageButtonProcess(uint16 control_id, uint8  state);
 void caliPageEditProcess(uint16 control_id, uint8 *str);
 void caliPageMenuProcess(uint16 control_id, uint8 item);
+
+void infoPageButtonProcess(uint16 control_id, uint8  state);
+void infoPageMenuProcess(uint16 control_id, uint8 item);
+void infoPageEditProcess(uint16 control_id, uint8 *str);
 
 void actionPageButtonProcess(uint16 control_id, uint8  state);
 void actionPageEditProcess(uint16 control_id, uint8 *str);

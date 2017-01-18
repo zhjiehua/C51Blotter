@@ -33,11 +33,11 @@ void actionPageButtonProcess(uint16 control_id, uint8  state)
 		case ACTEDIT_PUMPSEL_BUTTON:
 		break;
 		case ACTEDIT_TIPSSEL_BUTTON:
-			break;
+		break;
 		case ACTEDIT_VOICESEL_BUTTON:
-			break;
+		break;
 		case ACTEDIT_SPEEDSEL_BUTTON:
-			break;
+		break;
 		case ACTEDIT_BACK_BUTTON:
 		break;
 		default:
@@ -52,9 +52,9 @@ void actionPageEditProcess(uint16 control_id, uint8 *str)
 	{
 		case ACTEDIT_ADDAMOUNT_EDIT:
 			if(pProjectMan->pump == 8)//0，无泵
-				SetTextValueFloat(ACTIONPAGE_INDEX, ACTEDIT_ADDAMOUNT_EDIT, 0.0);
+				SetTextValueInt32(ACTIONPAGE_INDEX, ACTEDIT_ADDAMOUNT_EDIT, 0);
 			else
-				pProjectMan->addAmount = StringToFloat(str);
+				pProjectMan->addAmount = (uint8)StringToInt32(str);//StringToFloat(str);
 		break;
 		case ACTEDIT_IMBIAMOUNT_EDIT:
 			pProjectMan->imbiAmount = StringToInt32(str);
@@ -80,11 +80,22 @@ void actionPageMenuProcess(uint16 control_id, uint8 item)
 	{
 	case ACTEDIT_PUMPSEL_MENU:
 		{
-			pProjectMan->pump = item;
-			if(item == 8) //0，无泵
+			if(pProjectMan->pump != item)
 			{
-				pProjectMan->addAmount = 0;
-				SetTextValueFloat(ACTIONPAGE_INDEX, ACTEDIT_ADDAMOUNT_EDIT, 0.0);
+				//如果是pump0转换到其他值，则初始化加注量为最小值2
+				if(pProjectMan->pump == PUMP0)
+				{
+					pProjectMan->addAmount = 2;
+					SetTextValueInt32(ACTIONPAGE_INDEX, ACTEDIT_ADDAMOUNT_EDIT, 2);
+				}	
+
+				pProjectMan->pump = item;
+				if(item == PUMP0) //0，无泵
+				{
+					pProjectMan->addAmount = 0;
+					//SetTextValueFloat(ACTIONPAGE_INDEX, ACTEDIT_ADDAMOUNT_EDIT, 0.0);
+					SetTextValueInt32(ACTIONPAGE_INDEX, ACTEDIT_ADDAMOUNT_EDIT, 0);
+				}
 			}	
 		}
 		break;

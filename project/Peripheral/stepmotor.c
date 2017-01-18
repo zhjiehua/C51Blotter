@@ -4,6 +4,7 @@
 #include "sensor.h"
 #include "stdlib.h"
 #include "../CPrintf.h"
+#include "../UILogic/managerment.h"
 
 static StepMotor_TypeDef stepMotor;
 StepMotor_TypeDef *pStepMotor = &stepMotor;
@@ -24,41 +25,48 @@ const uint8_t AbsCoordinate[10] =
 	3,  //手动点 POS_HANDLE = 	
 };
 
-////定位速度
-//const SpeedLevel_TypeDef speedLevel[] = {
-//	{STEPMOTOR_FREQ(0.02), 0.02*SPEED_CONST},
-//	{STEPMOTOR_FREQ(0.05), 0.05*SPEED_CONST},
-//	{STEPMOTOR_FREQ(0.1),  0.1*SPEED_CONST},
-//	{STEPMOTOR_FREQ(0.15), 0.15*SPEED_CONST},
-//	{STEPMOTOR_FREQ(0.3), 0.3*SPEED_CONST},
-//	{STEPMOTOR_FREQ(0.5), 0.5*SPEED_CONST},
-//	{STEPMOTOR_FREQ(0.7), 0.7*SPEED_CONST},
-//	{STEPMOTOR_FREQ(0.9), 0.9*SPEED_CONST},
-//	{STEPMOTOR_FREQ(1.0), 1.0*SPEED_CONST},
-//	{STEPMOTOR_FREQ(1.2), 1.2*SPEED_CONST},
-//	{STEPMOTOR_FREQ(1.4), 1.4*SPEED_CONST},
-//	{STEPMOTOR_FREQ(1.6), 1.6*SPEED_CONST},
-//	{STEPMOTOR_FREQ(1.8), 1.8*SPEED_CONST},
-//	{STEPMOTOR_FREQ(2.0), 2.0*SPEED_CONST},
-//};
-
+#if 0
 //定位速度
 const SpeedLevel_TypeDef speedLevel[] = {
-	{STEPMOTOR_FREQ(0.10), 0.10*SPEED_CONST},
+	{STEPMOTOR_FREQ(0.10), 0.10*SPEED_CONST},	//0
+	{STEPMOTOR_FREQ(0.13), 0.13*SPEED_CONST},
+	{STEPMOTOR_FREQ(0.16), 0.16*SPEED_CONST},
+	{STEPMOTOR_FREQ(0.20), 0.20*SPEED_CONST},
+	{STEPMOTOR_FREQ(0.24), 0.24*SPEED_CONST},
+	{STEPMOTOR_FREQ(0.29), 0.29*SPEED_CONST},	//5
+	{STEPMOTOR_FREQ(0.34), 0.34*SPEED_CONST},
+	{STEPMOTOR_FREQ(0.40), 0.40*SPEED_CONST},
+	{STEPMOTOR_FREQ(0.48), 0.48*SPEED_CONST},
+	{STEPMOTOR_FREQ(0.60), 0.60*SPEED_CONST},
+	{STEPMOTOR_FREQ(0.75), 0.75*SPEED_CONST},	//10
+	{STEPMOTOR_FREQ(0.90), 0.90*SPEED_CONST},
+	{STEPMOTOR_FREQ(1.05), 1.05*SPEED_CONST},
+	{STEPMOTOR_FREQ(1.20), 1.20*SPEED_CONST},
+	{STEPMOTOR_FREQ(1.40), 1.40*SPEED_CONST},
+	{STEPMOTOR_FREQ(1.60), 1.60*SPEED_CONST},	//15
+	{STEPMOTOR_FREQ(1.80), 1.80*SPEED_CONST},
+	{STEPMOTOR_FREQ(2.15), 2.15*SPEED_CONST},
+	{STEPMOTOR_FREQ(2.30), 2.30*SPEED_CONST},
+};
+#else
+//定位速度
+const SpeedLevel_TypeDef speedLevel[] = {
+	{STEPMOTOR_FREQ(0.10), 0.10*SPEED_CONST},   //0
 	{STEPMOTOR_FREQ(0.15), 0.15*SPEED_CONST},
 	{STEPMOTOR_FREQ(0.20), 0.20*SPEED_CONST},
-	{STEPMOTOR_FREQ(0.30), 0.30*SPEED_CONST},
-	{STEPMOTOR_FREQ(0.45), 0.45*SPEED_CONST},
-	{STEPMOTOR_FREQ(0.60), 0.60*SPEED_CONST},
+	{STEPMOTOR_FREQ(0.25), 0.25*SPEED_CONST},
+	{STEPMOTOR_FREQ(0.40), 0.40*SPEED_CONST},
+	{STEPMOTOR_FREQ(0.60), 0.60*SPEED_CONST},	//5
 	{STEPMOTOR_FREQ(0.80), 0.80*SPEED_CONST},
 	{STEPMOTOR_FREQ(1.00), 1.00*SPEED_CONST},
 	{STEPMOTOR_FREQ(1.20), 1.20*SPEED_CONST},
 	{STEPMOTOR_FREQ(1.40), 1.40*SPEED_CONST},
-	{STEPMOTOR_FREQ(1.60), 1.60*SPEED_CONST},
+	{STEPMOTOR_FREQ(1.60), 1.60*SPEED_CONST},	//10
 	{STEPMOTOR_FREQ(1.80), 1.80*SPEED_CONST},
 	{STEPMOTOR_FREQ(2.00), 2.00*SPEED_CONST},
 	{STEPMOTOR_FREQ(2.20), 2.20*SPEED_CONST},
 };
+#endif
 
 const uint8_t speedLevelSize = (sizeof(speedLevel)/sizeof(speedLevel[0]));
 
@@ -114,6 +122,8 @@ static void StepMotor_Stop(void)
 
 static void StepMotor_StopAndAlign(uint8_t len)
 {
+	pStepMotor->SetCMD(DISABLE);   //立即减速
+
 	pStepMotor->SetPos(len);
 	while(!pStepMotor->IsOnPos())
 	{
@@ -176,10 +186,18 @@ static void StepMotor_Home(void)
 	{
 		if(pSensor->GetStatus(SENSOR_HOME))
 			pStepMotor->UpdatePos();	
-	} 
+	}
+	
+	pStepMotor->SetPos(9);
+	while(!pStepMotor->IsOnPos())
+	{
+		if(pSensor->GetStatus(SENSOR_POS))
+			pStepMotor->UpdatePos();	
+	}
+	 
 	pStepMotor->SetCMD(DISABLE);   //原点传感器检测到立即减速
 
-	pStepMotor->SetPos(3);
+	pStepMotor->SetPos(2);
 	while(!pStepMotor->IsOnPos())
 	{
 		if(pSensor->GetStatus(SENSOR_POS))
@@ -328,7 +346,8 @@ static void StepMotor_RelativePosition(uint8_t desTank, uint8_t srcTank)
 //步进电机初始化
 void StepMotor_Init(void)
 {
-	pStepMotor->offset = STEPMOTOR_OFFSET;
+	//pStepMotor->offset = STEPMOTOR_OFFSET;
+	pStepMotor->offset = pProjectMan->posCali1;
 	pStepMotor->speedStatus = SPEED_NONE;
 	pStepMotor->pSpeedLevel = speedLevel;
 	pStepMotor->curSpeedIndex = 0;
@@ -364,6 +383,8 @@ void StepMotor_Init(void)
     
     TMOD &= ~0x40;                  //C/T1=0, 对内部时钟进行时钟输出
 //  TMOD |= 0x40;                   //C/T1=1, 对T1引脚的外部时钟进行时钟输出
+
+	IP |= 0x08;  //定时器1优先级高
 
     TL1 = pStepMotor->pSpeedLevel[0].speed;                 //初始化计时值
     TH1 = pStepMotor->pSpeedLevel[0].speed >> 8;

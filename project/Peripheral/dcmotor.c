@@ -1,6 +1,7 @@
 #include "dcmotor.h"
 #include "sensor.h"
 #include "uart.h"
+#include "../CPrintf.h"
 
 static DCMotor_TypeDef dcMotor;
 DCMotor_TypeDef *pDCMotor = &dcMotor;
@@ -192,23 +193,63 @@ static uint8_t DCMotor_IsOnPos()
 	return (pDCMotor->curCount >= pDCMotor->desCount); 		
 }
 
+//如果向下卡住了，则向上动一下，在向下走，直到到位；向上同理
 static void DCMotor_WastePump_SetPos(Position_TypeDef pos)
 {
+	uint16_t cnt = 0;
+	uint8_t flag = 0;
+
 	if(pos == UP)
 	{
 		pSensor->SetCheckEdge(RASINGEDGE);
 
 		pDCMotor->SetPos(1);
-		pDCMotor->SetSpeed(PUMP_WASTE, 100-30);
-		//pDCMotor->SetSpeed(PUMP_WASTE, 100); //CW方向时，100表示不转，0为最大速度
+		//pDCMotor->SetSpeed(PUMP_WASTE, 100-30);
+		pDCMotor->SetSpeed(PUMP_WASTE, 0); //CW方向时，100表示不转，0为最大速度
 		pDCMotor->SetDir(PUMP_WASTE, CW);
 		pDCMotor->SetCMD(PUMP_WASTE, ENABLE);
 
+		cDebug("UP\n");
 		while(!pDCMotor->IsOnPos())
 		{
+			//cDebug("cnt = %d\n", cnt);
+			if(flag == 0)
+			{
+				cnt++;
+				//cDebug("+++++++ cnt = %d\n", cnt);
+				if(cnt >= 300)
+				{
+					cnt = 0;
+					//pDCMotor->SetPos(1);
+					pDCMotor->SetCMD(PUMP_WASTE, DISABLE);
+					pDCMotor->SetSpeed(PUMP_WASTE, 100);
+					pDCMotor->SetDir(PUMP_WASTE, CCW);
+					pDCMotor->SetCMD(PUMP_WASTE, ENABLE);
+					flag = 1;
+					cDebug("UP down\n");
+				}
+			}
+			else
+			{
+				cnt++;
+				//cDebug("------ cnt = %d\n", cnt);
+				if(cnt >= 100)
+				{
+					cnt = 0;
+					pDCMotor->SetPos(1);
+					pDCMotor->SetCMD(PUMP_WASTE, DISABLE);
+					pDCMotor->SetSpeed(PUMP_WASTE, 0);
+					pDCMotor->SetDir(PUMP_WASTE, CW);
+					pDCMotor->SetCMD(PUMP_WASTE, ENABLE);
+					flag = 0;
+					cDebug("UP up\n");
+				}	
+			}
+			
 			if(pSensor->GetStatus(SENSOR_UP))
 				pDCMotor->UpdatePos();	
 		}
+		cDebug("UP finish\n");
 		pDCMotor->SetCMD(PUMP_WASTE, DISABLE);		
 	}
 	else
@@ -216,20 +257,60 @@ static void DCMotor_WastePump_SetPos(Position_TypeDef pos)
 		pSensor->SetCheckEdge(RASINGEDGE);
 	
 		pDCMotor->SetPos(1);
-		pDCMotor->SetSpeed(PUMP_WASTE, 30);
-		//pDCMotor->SetSpeed(PUMP_WASTE, 100);  //CCW方向时，0表示不转，100为最大速度
+		//pDCMotor->SetSpeed(PUMP_WASTE, 30);
+		pDCMotor->SetSpeed(PUMP_WASTE, 100);  //CCW方向时，0表示不转，100为最大速度
 		pDCMotor->SetDir(PUMP_WASTE, CCW);
 		pDCMotor->SetCMD(PUMP_WASTE, ENABLE);
 
+		cDebug("DOWN\n");
+
 		while(!pDCMotor->IsOnPos())
 		{
+			//cDebug("cnt = %d\n", cnt);
+			if(flag == 0)
+			{
+				cnt++;
+				//cDebug("+++++++ cnt = %d\n", cnt);
+				if(cnt >= 300)
+				{
+					cnt = 0;
+					//pDCMotor->SetPos(1);
+					pDCMotor->SetCMD(PUMP_WASTE, DISABLE);
+					pDCMotor->SetSpeed(PUMP_WASTE, 0);
+					pDCMotor->SetDir(PUMP_WASTE, CW);
+					pDCMotor->SetCMD(PUMP_WASTE, ENABLE);
+					flag = 1;
+					cDebug("DOWN up\n");
+				}
+			}
+			else
+			{
+				cnt++;
+				//cDebug("------ cnt = %d\n", cnt);
+				if(cnt >= 100)
+				{
+					cnt = 0;
+					pDCMotor->SetPos(1);
+					pDCMotor->SetCMD(PUMP_WASTE, DISABLE);
+					pDCMotor->SetSpeed(PUMP_WASTE, 100);
+					pDCMotor->SetDir(PUMP_WASTE, CCW);
+					pDCMotor->SetCMD(PUMP_WASTE, ENABLE);
+					flag = 0;
+					cDebug("DOWN down\n");
+				}	
+			}
+
 			if(pSensor->GetStatus(SENSOR_DOWN))
 				pDCMotor->UpdatePos();	
 		}
+		cDebug("DOWN finish\n");
 
 		pDCMotor->SetCMD(PUMP_WASTE, DISABLE);
 		pDCMotor->SetDir(PUMP_WASTE, CW);//废液泵电机停止的时候要拉高方向引脚		
 	}
+
+	flag = 0;
+	cnt = 0;
 }
 
 //PWM初始化
@@ -253,6 +334,9 @@ void DCMotor_Init(void)
 		pDCMotor->SetCMD(i, DISABLE); //停止所有電機
 	}
 	pDCMotor->SetDir(PUMP_WASTE, CW); //废液泵电机停止的时候要拉高方向引脚
+
+	pDCMotor->SetCMD(DCMOTOR12, ENABLE);//夹管阀先使能，到时调用pDCMotor->SetSpeed(DCMOTOR12, 0);开，调用pDCMotor->SetSpeed(DCMOTOR12, 100);关
+	pDCMotor->SetSpeed(DCMOTOR12, 100);//关闭夹管阀
 
 	P_SW2 |= 0x80;  				//使能访问XSFR
 	PWMCFG = 0x00;                  //配置PWM的输出初始电平为低电平

@@ -67,6 +67,9 @@ void projectPageButtonProcess(uint16 control_id, uint8  state)
 				SeTimer(RUNNINGPAGE_INDEX, RUNNING_TIME_RTC, rtcTime);
 				//StartTimer(RUNNINGPAGE_INDEX, RUNNING_TIME_RTC);
 			}
+			else
+				SeTimer(RUNNINGPAGE_INDEX, RUNNING_TIME_RTC, 0);
+
 			SetControlVisiable(RUNNINGPAGE_INDEX, RUNNING_PAUSE_BUTTON, 0);
 			SetControlVisiable(RUNNINGPAGE_INDEX, RUNNING_STOP_BUTTON, 0);
 

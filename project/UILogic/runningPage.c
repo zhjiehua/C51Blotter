@@ -11,16 +11,22 @@ void runningPageButtonProcess(uint16 control_id, uint8  state)
 	switch(control_id)
 	{
 	case RUNNING_PAUSE_BUTTON:
-		SetTextValue(TIPS2PAGE_INDEX, TIPS2_TIPS_EDIT, PAUSE_TIPS);
-		SetScreen(TIPS2PAGE_INDEX);
+		if(pProjectMan->lang == 0)
+			SetTextValue(TIPS2PAGE_INDEX, TIPS2_TIPS_EDIT, "Are you really want to PAUSE the program?");
+		else
+			SetTextValue(TIPS2PAGE_INDEX, TIPS2_TIPS_EDIT, "ÊÇ·ñ¡¾ÔÝÍ£¡¿³ÌÐò£¿");
 		//pProjectMan->exception = EXCEPTION_PAUSE;
-		pProjectMan->exceptionButtonFlag = EXCEPTION_PAUSE;
+		pProjectMan->exceptionButtonFlag = EXCEPTION_PAUSE;	
+		SetScreen(TIPS2PAGE_INDEX);
 		break;
 	case RUNNING_STOP_BUTTON:
-		SetTextValue(TIPS2PAGE_INDEX, TIPS2_TIPS_EDIT, STOP_TIPS);
-		SetScreen(TIPS2PAGE_INDEX);
+		if(pProjectMan->lang == 0)
+			SetTextValue(TIPS2PAGE_INDEX, TIPS2_TIPS_EDIT, "Are you really want to STOP the program?");
+		else
+			SetTextValue(TIPS2PAGE_INDEX, TIPS2_TIPS_EDIT, "ÊÇ·ñ¡¾Í£Ö¹¡¿³ÌÐò£¿");
 		//pProjectMan->exception = EXCEPTION_STOP;
 		pProjectMan->exceptionButtonFlag = EXCEPTION_STOP;
+		SetScreen(TIPS2PAGE_INDEX);
 		break;
 		default:
 			cDebug("runningPage BUTTON error!\n");

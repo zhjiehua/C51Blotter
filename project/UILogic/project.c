@@ -4,7 +4,7 @@ extern "C" {
 
 #include "project.h"
 #include "managerment.h"
-#include "CPrintf.h"
+#include "../CPrintf.h"
 #include "stdio.h"
 
 #include "../Peripheral/dcmotor.h"
@@ -45,6 +45,11 @@ const char actionTipsMenuText[3][9] = {
 	"Sample",
 	"Membrane",
 };
+const char actionTipsMenuTextCh[3][5] = {
+	"无",
+	"样本",
+	"膜条",
+};
 
 const char actionVoiceMenuText[4][7] = {
 	"None",
@@ -52,24 +57,52 @@ const char actionVoiceMenuText[4][7] = {
 	"Middle",
 	"Long",
 };
+const char actionVoiceMenuTextCh[4][3] = {
+	"无",
+	"短",
+	"中",
+	"长",
+};
 
 const char actionSpeedMenuText[3][7] = {
 	"Slow",
 	"Middle",
 	"Fast",
 };
+const char actionSpeedMenuTextCh[3][5] = {
+	"慢速",
+	"中速",
+	"快速",
+};
 
+//char actSpeedMenuTextCh[3][5] = {
+//	"慢速",
+//	"中速",
+//	"快速",
+//};
+
+/************************************************************************/
+/* 信息页面下拉列表字符串                                             */
+/************************************************************************/
+const char langMenuText[2][8] = {
+	"English",
+	"Chinese",
+};
+const char langMenuTextCh[2][5] = {
+	"英文",
+	"中文",
+};
 /************************************************************************/
 /* 动作初始化Demo                                                       */
 /************************************************************************/
 const Action_TypeDef actionDemo = {
-	PUMP1,
-	SAMPLE_TIPS,
-	SHORT_VOICE,
-	1.0,
-	1,
+	PUMP0,
+	NO_TIPS,
+	NO_VOICE,
+	0,
+	0,
 	SLOW_SPEED,
-	{0, 1},
+	{0, 0},
 	1,
 	1,
 	"action0"
@@ -122,10 +155,16 @@ void fillTube(void)
 	uint8_t relCoord;
 
 	//提示是否灌注管道
+	pProjectMan->tipsButton = TIPS_NONE;
 	SetScreen(TIPS2PAGE_INDEX);//跳转到提示2页面
-	SetTextValue(TIPS2PAGE_INDEX, TIPS2_TIPS_EDIT, "Whether fill the tube?");
-	while(pProjectMan->tipsButton == TIPS_NONE)
-		beepAlarm(1);
+	if(pProjectMan->lang == 0)
+		SetTextValue(TIPS2PAGE_INDEX, TIPS2_TIPS_EDIT, "Whether fill the tube?");
+	else
+		SetTextValue(TIPS2PAGE_INDEX, TIPS2_TIPS_EDIT, "是否灌注管道？");
+
+	beepAlarm(1);
+	while(pProjectMan->tipsButton == TIPS_NONE);
+		
 	if(pProjectMan->tipsButton == TIPS_CANCEL)
 	{
 		pProjectMan->tipsButton = TIPS_NONE;
@@ -135,7 +174,10 @@ void fillTube(void)
 	pProjectMan->tipsButton = TIPS_NONE;
 
 	//状态显示灌注管道中
-	SetTextValue(RUNNINGPAGE_INDEX, RUNNING_STATUS_EDIT, "In filling tube……");
+	if(pProjectMan->lang == 0)
+		SetTextValue(RUNNINGPAGE_INDEX, RUNNING_STATUS_EDIT, "In filling tube……");
+	else
+		SetTextValue(RUNNINGPAGE_INDEX, RUNNING_STATUS_EDIT, "灌注管道中……");
 
 	SetScreen(SELECTPUMPPAGE_INDEX);//跳转到泵选择页面
 	BatchBegin(SELECTPUMPPAGE_INDEX);//更新泵选择页面控件状态
@@ -149,8 +191,9 @@ void fillTube(void)
 	BatchSetButtonValue(PUMPSEL_PUMP8_BUTTON, pProjectMan->pumpSelPumpSel&PUMP8_MASK);
 	BatchEnd();
 
-	while(pProjectMan->tipsButton == TIPS_NONE) //等待泵选择完成
-		beepAlarm(1);
+	beepAlarm(1);
+	while(pProjectMan->tipsButton == TIPS_NONE); //等待泵选择完成
+		
 	pProjectMan->tipsButton = TIPS_NONE;
 	SetScreen(RUNNINGPAGE_INDEX);//跳转到运行页面
 
@@ -166,13 +209,20 @@ void fillTube(void)
 
 	//提示将废液槽置于槽板号1的位置
 	SetScreen(TIPS1PAGE_INDEX);//跳转到提示1页面
-	SetTextValue(TIPS1PAGE_INDEX, TIPS1_TIPS_EDIT, "Please place the WASTE TANK in the Plate1");
-	while(pProjectMan->tipsButton == TIPS_NONE)
-		beepAlarm(1);
+	if(pProjectMan->lang == 0)
+		SetTextValue(TIPS1PAGE_INDEX, TIPS1_TIPS_EDIT, "Please place the WASTE TANK in the Plate1");
+	else
+		SetTextValue(TIPS1PAGE_INDEX, TIPS1_TIPS_EDIT, "请把废液槽置于板号1位置");
+	
+	beepAlarm(1);
+	while(pProjectMan->tipsButton == TIPS_NONE);
+		
 	pProjectMan->tipsButton = TIPS_NONE;
 	SetScreen(RUNNINGPAGE_INDEX);//跳转到运行页面
 	
 	//灌注要灌注的管道
+	//pStepMotor->offset = STEPMOTOR_PUMP_OFFSET;
+	pStepMotor->offset = pProjectMan->posCali2;
 	for(i=0;i<8;i++)
 	{
 		if(pProjectMan->pumpSelPumpSel & (0x01<<i))
@@ -180,6 +230,8 @@ void fillTube(void)
 			//将废液槽转到对应的泵位置
 			relCoord = pStepMotor->Abs2Rel(AbsCoordinate[i]);
 			pStepMotor->RelativePosition(relCoord, AbsCoordinate[9]); //AbsCoordinate[9]为废液槽
+			
+			os_wait(K_TMO, 6000, 0);
 
 			pDCMotor->SetSpeed(i, 10);
 			pDCMotor->SetCMD(i, ENABLE);				
@@ -191,9 +243,14 @@ void fillTube(void)
 			{
 				//提示是否继续灌注管道
 				SetScreen(TIPS2PAGE_INDEX);//跳转到提示2页面
-				SetTextValue(TIPS2PAGE_INDEX, TIPS2_TIPS_EDIT, "Whether continue fill the tube?");
-				while(pProjectMan->tipsButton == TIPS_NONE)
-					beepAlarm(1);
+				if(pProjectMan->lang == 0)
+					SetTextValue(TIPS2PAGE_INDEX, TIPS2_TIPS_EDIT, "Whether continue fill the tube?");
+				else
+					SetTextValue(TIPS2PAGE_INDEX, TIPS2_TIPS_EDIT, "是否继续灌注管道？");
+				
+				beepAlarm(1);
+				while(pProjectMan->tipsButton == TIPS_NONE);
+					
 				SetScreen(RUNNINGPAGE_INDEX);//跳转到运行页面
 				if(pProjectMan->tipsButton == TIPS_CANCEL)
 				{
@@ -210,8 +267,12 @@ void fillTube(void)
 					pDCMotor->SetCMD(i, DISABLE);
 				}
 			}
+
+			os_wait(K_TMO, 6000, 0);
 		}
 	}
+	//pStepMotor->offset = STEPMOTOR_OFFSET;
+	pStepMotor->offset = pProjectMan->posCali1;
 	
 	//吸取废液
 	wasteFluidAbsorb();
@@ -222,9 +283,14 @@ void fillTube(void)
 
 	//提示移动废液槽
 	SetScreen(TIPS1PAGE_INDEX);//跳转到提示1页面
-	SetTextValue(TIPS1PAGE_INDEX, TIPS1_TIPS_EDIT, "Please take away the Waste Tank");
-	while(pProjectMan->tipsButton == TIPS_NONE)
-		beepAlarm(1);
+	if(pProjectMan->lang == 0)
+		SetTextValue(TIPS1PAGE_INDEX, TIPS1_TIPS_EDIT, "Please take away the Waste Tank");
+	else
+		SetTextValue(TIPS1PAGE_INDEX, TIPS1_TIPS_EDIT, "请移走废液槽");
+	
+	beepAlarm(1);
+	while(pProjectMan->tipsButton == TIPS_NONE);
+		
 	SetScreen(RUNNINGPAGE_INDEX);//跳转到运行页面
 	pProjectMan->tipsButton = TIPS_NONE;
 
@@ -243,7 +309,10 @@ void placePlate(void)
 	endPlate = (pProjectMan->endTank-1)/TANK_PER_PLATE+1;
 	
 	//状态显示放置槽板中
-	SetTextValue(RUNNINGPAGE_INDEX, RUNNING_STATUS_EDIT, "In placing Plate……");
+	if(pProjectMan->lang == 0)
+		SetTextValue(RUNNINGPAGE_INDEX, RUNNING_STATUS_EDIT, "In placing Plate……");
+	else
+		SetTextValue(RUNNINGPAGE_INDEX, RUNNING_STATUS_EDIT, "放置槽板中……");
 
 	//for(i=startPlate;i<=endPlate;i++)
 	for(i=endPlate;i>=startPlate;i--)
@@ -254,10 +323,15 @@ void placePlate(void)
 
 		//提示放置槽板
 		SetScreen(TIPS1PAGE_INDEX);//跳转到提示1页面
-		sprintf(str, "Please place the PLATE in the Plate%d", i);
+		if(pProjectMan->lang == 0)
+			sprintf(str, "Please place the PLATE in the Plate%d", i);
+		else
+			sprintf(str, "请将槽板置于【板号%d】位置", i);
 		SetTextValue(TIPS1PAGE_INDEX, TIPS1_TIPS_EDIT, str);
-		while(pProjectMan->tipsButton == TIPS_NONE)
-			beepAlarm(1);
+
+		beepAlarm(1);
+		while(pProjectMan->tipsButton == TIPS_NONE);
+			
 		SetScreen(RUNNINGPAGE_INDEX);//跳转到运行页面
 		pProjectMan->tipsButton = TIPS_NONE;		
 	}
@@ -277,11 +351,24 @@ void imbibition(void)
 	if(pProjectMan->pCurRunningAction->imbiAmount)//吸液量大于0
 	{
 		//状态显示吸液中
-		SetTextValue(RUNNINGPAGE_INDEX, RUNNING_STATUS_EDIT, "In imbibing……");
+		if(pProjectMan->lang == 0)
+			SetTextValue(RUNNINGPAGE_INDEX, RUNNING_STATUS_EDIT, "In imbibing……");
+		else
+			SetTextValue(RUNNINGPAGE_INDEX, RUNNING_STATUS_EDIT, "吸液中……");
 
 		//启动真空泵
 		pDCMotor->SetCMD(PUMP_VACUUM, ENABLE);
-		
+		//松开夹管阀
+		pDCMotor->SetSpeed(PUMP_PINCH, 0);
+
+		//延时，抽空废液瓶的空气形成气压差
+		os_wait(K_TMO, 6000, 0);
+		os_wait(K_TMO, 6000, 0);
+		os_wait(K_TMO, 6000, 0);
+		os_wait(K_TMO, 6000, 0);
+		os_wait(K_TMO, 6000, 0);
+		os_wait(K_TMO, 6000, 0);
+
 		//for(i=pProjectMan->startTank;i<=pProjectMan->endTank;i++)
 		for(i=pProjectMan->endTank;i>=pProjectMan->startTank;i--)
 		{
@@ -291,17 +378,32 @@ void imbibition(void)
 			//将对应槽转到吸液口位置
 			relCoord = pStepMotor->Abs2Rel(AbsCoordinate[8]);	
 			pStepMotor->RelativePosition(relCoord, i);
-			
+
 			//放下废液口
 			pDCMotor->WastePump_SetPos(DOWN);
+			//cDebug("DOWN\n");
 			
 			//延时对应时间
-			os_wait(K_TMO, 600*pProjectMan->pCurRunningAction->imbiAmount, 0);
-			
+			os_wait(K_TMO, 6000*pProjectMan->pCurRunningAction->imbiAmount, 0);
+			os_wait(K_TMO, 6000*pProjectMan->pCurRunningAction->imbiAmount, 0);
+			os_wait(K_TMO, 6000*pProjectMan->pCurRunningAction->imbiAmount, 0);
+			os_wait(K_TMO, 6000*pProjectMan->pCurRunningAction->imbiAmount, 0);
+
 			//提起废液口
-			pDCMotor->WastePump_SetPos(UP);	
+			pDCMotor->WastePump_SetPos(UP);
+			//cDebug("UP\n");	
 		}
 		
+		//延时，吸取剩下的液体
+		os_wait(K_TMO, 6000, 0);
+		os_wait(K_TMO, 6000, 0);
+		os_wait(K_TMO, 6000, 0);
+		os_wait(K_TMO, 6000, 0);
+		os_wait(K_TMO, 6000, 0);
+		os_wait(K_TMO, 6000, 0);
+
+		//关闭夹管阀
+		pDCMotor->SetSpeed(PUMP_PINCH, 100);
 		//停止真空泵
 		pDCMotor->SetCMD(PUMP_VACUUM, DISABLE);
 		
@@ -323,7 +425,10 @@ void hint(void)
 	if(pProjectMan->pCurRunningAction->tips != NO_TIPS)//有提示
 	{
 		//状态显示吸液中
-		SetTextValue(RUNNINGPAGE_INDEX, RUNNING_STATUS_EDIT, "In hinting……");
+		if(pProjectMan->lang == 0)
+			SetTextValue(RUNNINGPAGE_INDEX, RUNNING_STATUS_EDIT, "In hinting……");
+		else
+			SetTextValue(RUNNINGPAGE_INDEX, RUNNING_STATUS_EDIT, "提示中……");
 		
 		//for(i=pProjectMan->startTank;i<=pProjectMan->endTank;i++)
 		for(i=pProjectMan->endTank;i>=pProjectMan->startTank;i--)
@@ -336,16 +441,24 @@ void hint(void)
 			SetScreen(TIPS1PAGE_INDEX);//跳转到提示1页面
 			if(pProjectMan->pCurRunningAction->tips == SAMPLE_TIPS)
 			{
-				sprintf(str, "Please place the SAMPLE in the Tank%d", i);
+				if(pProjectMan->lang == 0)
+					sprintf(str, "Please place the SAMPLE in the Tank%d", i);
+				else
+					sprintf(str, "请将【样本】置于【槽号%d】位置", i);
 				SetTextValue(TIPS1PAGE_INDEX, TIPS1_TIPS_EDIT, str);				
 			}
 			else
 			{
-				sprintf(str, "Please place the MEMBRANE in the Tank%d", i);
+				if(pProjectMan->lang == 0)
+					sprintf(str, "Please place the MEMBRANE in the Tank%d", i);
+				else
+					sprintf(str, "请将【膜条】置于【槽号%d】位置", i);
 				SetTextValue(TIPS1PAGE_INDEX, TIPS1_TIPS_EDIT, str);
 			}
+
 			while(pProjectMan->tipsButton == TIPS_NONE)
 				beepAlarm(pProjectMan->pCurRunningAction->voice+1);
+
 			SetScreen(RUNNINGPAGE_INDEX);//跳转到运行页面
 			pProjectMan->tipsButton = TIPS_NONE;
 		}	
@@ -366,12 +479,17 @@ void adding(void)
 	if(pProjectMan->pCurRunningAction->pump != 8)//有选择泵，编号8为0，表示无泵
 	{
 		//状态显示吸液中
-		SetTextValue(RUNNINGPAGE_INDEX, RUNNING_STATUS_EDIT, "In adding……");
+		if(pProjectMan->lang == 0)
+			SetTextValue(RUNNINGPAGE_INDEX, RUNNING_STATUS_EDIT, "In adding……");
+		else
+			SetTextValue(RUNNINGPAGE_INDEX, RUNNING_STATUS_EDIT, "加注中……");
 
 		//更新泵辑框内容为当前选择的泵编号
 		SetTextValueInt32(RUNNINGPAGE_INDEX, RUNNING_PUMP_EDIT, pProjectMan->pCurRunningAction->pump+1);		
 
 		//for(i=pProjectMan->startTank;i<=pProjectMan->endTank;i++)
+		//pStepMotor->offset = STEPMOTOR_PUMP_OFFSET;
+		pStepMotor->offset = pProjectMan->posCali2;
 		for(i=pProjectMan->endTank;i>=pProjectMan->startTank;i--)
 		{
 			//更新加注编辑框内容为当前槽
@@ -381,12 +499,25 @@ void adding(void)
 			relCoord = pStepMotor->Abs2Rel(AbsCoordinate[pProjectMan->pCurRunningAction->pump]);	
 			pStepMotor->RelativePosition(relCoord, i);
 			
+			os_wait(K_TMO, 6000, 0);
+
 			//蠕动泵加注
-			pDCMotor->SetCMD(pProjectMan->pCurRunningAction->pump, ENABLE);
 			time = pProjectMan->pCurRunningAction->addAmount*pProjectMan->pCaliPumpPara[pProjectMan->pCurRunningAction->pump];
-			os_wait(K_TMO, 150*time, 0);
-			pDCMotor->SetCMD(pProjectMan->pCurRunningAction->pump, DISABLE);	
-		}	
+			//SetTextValueInt32(RUNNINGPAGE_INDEX, RUNNING_IMBITANK_EDIT, pProjectMan->pCurRunningAction->addAmount);
+			//SetTextValueInt32(RUNNINGPAGE_INDEX, RUNNING_IMBITANK_EDIT, 10*time);
+			//cDebug("adding: %d mL\n", pProjectMan->pCurRunningAction->addAmount);
+			pDCMotor->SetCMD(pProjectMan->pCurRunningAction->pump, ENABLE);
+			os_wait(K_TMO, 10*time, 0);
+			os_wait(K_TMO, 10*time, 0);
+			os_wait(K_TMO, 10*time, 0);
+			os_wait(K_TMO, 10*time, 0);
+			os_wait(K_TMO, 10*time, 0);
+			pDCMotor->SetCMD(pProjectMan->pCurRunningAction->pump, DISABLE);
+			
+			os_wait(K_TMO, 6000, 0);	
+		}
+		//pStepMotor->offset = STEPMOTOR_OFFSET;
+		pStepMotor->offset = pProjectMan->posCali1;	
 	}
 
 	//更新加注编辑框内容为0
@@ -405,7 +536,10 @@ void incubation(void)
 		|| pProjectMan->pCurRunningAction->shakeTime.minute > 0)//孵育时间大于0
 	{
 		//状态显示孵育中
-		SetTextValue(RUNNINGPAGE_INDEX, RUNNING_STATUS_EDIT, "In incubating……");
+		if(pProjectMan->lang == 0)
+			SetTextValue(RUNNINGPAGE_INDEX, RUNNING_STATUS_EDIT, "In incubating……");
+		else
+			SetTextValue(RUNNINGPAGE_INDEX, RUNNING_STATUS_EDIT, "孵育中……");
 
 		//启动RTC
 		StartTimer(RUNNINGPAGE_INDEX, RUNNING_TIME_RTC);
@@ -439,11 +573,28 @@ void incubation(void)
 			//检查是否有暂停
 			if(pProjectMan->exception == EXCEPTION_PAUSE)
 			{
+				//pProjectMan->exception = EXCEPTION_NONE;
+
 				//暂停RTC
 				PauseTimer(RUNNINGPAGE_INDEX, RUNNING_TIME_RTC);
 
 				//停止并对准槽
-				pStepMotor->StopAndAlign(2);
+				switch(pProjectMan->pCurRunningAction->shakeSpeed)
+				{
+					case 0:	 //慢
+						pStepMotor->StopAndAlign(2);
+					break;
+					case 1:	 //中
+						pStepMotor->StopAndAlign(4);
+					break;
+					case 2:	 //快
+						pStepMotor->StopAndAlign(7);
+					break;
+					default: //默认
+						pStepMotor->StopAndAlign(2);
+					break;
+				}
+				//pStepMotor->StopAndAlign(2);
 
 				//等到恢复
 				while(pProjectMan->exception != EXCEPTION_NONE)
@@ -489,10 +640,27 @@ void incubation(void)
 			}
 			else if(pProjectMan->exception == EXCEPTION_STOP)
 			{
+				//pProjectMan->exception = EXCEPTION_NONE;
+
 				StopTimer(RUNNINGPAGE_INDEX, RUNNING_TIME_RTC);
 
 				//停止并对准槽
-				pStepMotor->StopAndAlign(2);
+				switch(pProjectMan->pCurRunningAction->shakeSpeed)
+				{
+					case 0:	 //慢
+						pStepMotor->StopAndAlign(2);
+					break;
+					case 1:	 //中
+						pStepMotor->StopAndAlign(4);
+					break;
+					case 2:	 //快
+						pStepMotor->StopAndAlign(7);
+					break;
+					default: //默认
+						pStepMotor->StopAndAlign(2);
+					break;
+				}
+				//pStepMotor->StopAndAlign(2);
 
 				pProjectMan->RTCTimeout = 0;
 
@@ -500,6 +668,23 @@ void incubation(void)
 			}
 		}
 		pProjectMan->RTCTimeout = 0;		
+
+		//停止并对准槽
+		switch(pProjectMan->pCurRunningAction->shakeSpeed)
+		{
+			case 0:	 //慢
+				pStepMotor->StopAndAlign(2);
+			break;
+			case 1:	 //中
+				pStepMotor->StopAndAlign(4);
+			break;
+			case 2:	 //快
+				pStepMotor->StopAndAlign(7);
+			break;
+			default: //默认
+				pStepMotor->StopAndAlign(2);
+			break;
+		}
 
 		//除能暂停 停止按钮
 		SetControlVisiable(RUNNINGPAGE_INDEX, RUNNING_PAUSE_BUTTON, 0);
@@ -536,7 +721,10 @@ void projectProgram(void)
 	while(!pStepMotor->IsStop());
 
 	//状态显示吸液中
-	SetTextValue(RUNNINGPAGE_INDEX, RUNNING_STATUS_EDIT, "In preparing……");
+	if(pProjectMan->lang == 0)
+		SetTextValue(RUNNINGPAGE_INDEX, RUNNING_STATUS_EDIT, "In preparing……");
+	else
+		SetTextValue(RUNNINGPAGE_INDEX, RUNNING_STATUS_EDIT, "准备中……");
 
 	//回原点
 	pStepMotor->Home();
@@ -548,7 +736,10 @@ void projectProgram(void)
 	placePlate();
 
 	//状态显示吸液中
-	SetTextValue(RUNNINGPAGE_INDEX, RUNNING_STATUS_EDIT, "Preparation finish");
+	if(pProjectMan->lang == 0)
+		SetTextValue(RUNNINGPAGE_INDEX, RUNNING_STATUS_EDIT, "Preparation finish!");
+	else
+		SetTextValue(RUNNINGPAGE_INDEX, RUNNING_STATUS_EDIT, "准备完成！");
 
 	//执行动作
 	for(i=0;i<ACTIONS_PER_PROJECT;i++)
@@ -590,13 +781,24 @@ void projectProgram(void)
 	}
 
 	//状态显示完成
-	SetTextValue(RUNNINGPAGE_INDEX, RUNNING_STATUS_EDIT, "Finish!");
+	if(pProjectMan->lang == 0)
+		SetTextValue(RUNNINGPAGE_INDEX, RUNNING_STATUS_EDIT, "Finish!");
+	else
+		SetTextValue(RUNNINGPAGE_INDEX, RUNNING_STATUS_EDIT, "完成!");
 	
+	//回原点
+	pStepMotor->Home();
+
 	//提示动作完成
 	SetScreen(TIPS1PAGE_INDEX);//跳转到提示1页面
-	SetTextValue(TIPS1PAGE_INDEX, TIPS1_TIPS_EDIT, "Project has Finish!");
-	while(pProjectMan->tipsButton == TIPS_NONE)
-		beepAlarm(pProjectMan->pCurRunningAction->voice+1);
+	if(pProjectMan->lang == 0)
+		SetTextValue(TIPS1PAGE_INDEX, TIPS1_TIPS_EDIT, "Project has Finish!");
+	else
+		SetTextValue(TIPS1PAGE_INDEX, TIPS1_TIPS_EDIT, "项目完成!");
+	
+	beepAlarm(5);
+	while(pProjectMan->tipsButton == TIPS_NONE);
+		
 	pProjectMan->tipsButton = TIPS_NONE;
 
 	//跳到项目页面
@@ -611,8 +813,16 @@ void wasteFluidAbsorb(void)
 	uint8_t relCoord;
 
 	//状态显示孵育中
-	SetTextValue(RUNNINGPAGE_INDEX, RUNNING_STATUS_EDIT, "In absorbing waste fluid……");
-	SetTextValue(PURGEPAGE_INDEX, PURGE_STATUS_EDIT, "In absorbing waste fluid……");
+	if(pProjectMan->lang == 0)
+	{
+		SetTextValue(RUNNINGPAGE_INDEX, RUNNING_STATUS_EDIT, "In absorbing waste fluid……");
+		SetTextValue(PURGEPAGE_INDEX, PURGE_STATUS_EDIT, "In absorbing waste fluid……");
+	}
+	else
+	{
+		SetTextValue(RUNNINGPAGE_INDEX, RUNNING_STATUS_EDIT, "吸取废液中……");
+		SetTextValue(PURGEPAGE_INDEX, PURGE_STATUS_EDIT, "吸取废液中……");
+	}
 
 	//将废液槽转到废液口位置
 	relCoord = pStepMotor->Abs2Rel(AbsCoordinate[8]); //废液口位置
@@ -620,6 +830,16 @@ void wasteFluidAbsorb(void)
 
 	//启动真空泵
 	pDCMotor->SetCMD(PUMP_VACUUM, ENABLE);
+	//松开夹管阀
+	pDCMotor->SetSpeed(PUMP_PINCH, 0);
+
+	//延时，抽空废液瓶的空气形成气压差
+	os_wait(K_TMO, 6000, 0);
+	os_wait(K_TMO, 6000, 0);
+	os_wait(K_TMO, 6000, 0);
+	os_wait(K_TMO, 6000, 0);
+	os_wait(K_TMO, 6000, 0);
+	os_wait(K_TMO, 6000, 0);
 
 	//放下废液口
 	pDCMotor->WastePump_SetPos(DOWN);
@@ -634,10 +854,24 @@ void wasteFluidAbsorb(void)
 	os_wait(K_TMO, 6000, 0);
 	os_wait(K_TMO, 6000, 0);
 	os_wait(K_TMO, 6000, 0);
+	os_wait(K_TMO, 6000, 0);
+	os_wait(K_TMO, 6000, 0);
+	os_wait(K_TMO, 6000, 0);
+	os_wait(K_TMO, 6000, 0);
 
 	//提起废液口
 	pDCMotor->WastePump_SetPos(UP);
 
+	//延时，吸取剩下的液体
+	os_wait(K_TMO, 6000, 0);
+	os_wait(K_TMO, 6000, 0);
+	os_wait(K_TMO, 6000, 0);
+	os_wait(K_TMO, 6000, 0);
+	os_wait(K_TMO, 6000, 0);
+	os_wait(K_TMO, 6000, 0);
+
+	//关闭夹管阀
+	pDCMotor->SetSpeed(PUMP_PINCH, 100);
 	//停止真空泵
 	pDCMotor->SetCMD(PUMP_VACUUM, DISABLE);
 
@@ -670,13 +904,21 @@ void purgeProgram(void)
 	SetControlEnable(PURGEPAGE_INDEX, PURGE_PUMP7_BUTTON, 0);
 	SetControlEnable(PURGEPAGE_INDEX, PURGE_PUMP8_BUTTON, 0);
 
-	SetTextValue(PURGEPAGE_INDEX, PURGE_STATUS_EDIT, "In preparing……");
+	if(pProjectMan->lang == 0)
+		SetTextValue(PURGEPAGE_INDEX, PURGE_STATUS_EDIT, "In preparing……");
+	else
+		SetTextValue(PURGEPAGE_INDEX, PURGE_STATUS_EDIT, "准备中……");
 
 	//提示将要清洗的管道置于蒸馏水中
 	SetScreen(TIPS1PAGE_INDEX);//跳转到提示1页面
-	SetTextValue(TIPS1PAGE_INDEX, TIPS1_TIPS_EDIT, "Please place the tube that to be washed in the distilled water");
-	while(pProjectMan->tipsButton == TIPS_NONE)
-		beepAlarm(1);
+	if(pProjectMan->lang == 0)
+		SetTextValue(TIPS1PAGE_INDEX, TIPS1_TIPS_EDIT, "Please place the tube that to be washed in the distilled water");
+	else
+		SetTextValue(TIPS1PAGE_INDEX, TIPS1_TIPS_EDIT, "请将要清洗的管道置于蒸馏水中");
+
+	beepAlarm(1);
+	while(pProjectMan->tipsButton == TIPS_NONE);
+		
 	pProjectMan->tipsButton = TIPS_NONE;
 	SetScreen(PURGEPAGE_INDEX);//跳转到清洗页面
 
@@ -689,20 +931,33 @@ void purgeProgram(void)
 
 	//提示将废液槽置于槽板号1的位置
 	SetScreen(TIPS1PAGE_INDEX);//跳转到提示1页面
-	SetTextValue(TIPS1PAGE_INDEX, TIPS1_TIPS_EDIT, "Please place the Waste Tank to the plate1");
-	while(pProjectMan->tipsButton == TIPS_NONE)
-		beepAlarm(1);
+	if(pProjectMan->lang == 0)
+		SetTextValue(TIPS1PAGE_INDEX, TIPS1_TIPS_EDIT, "Please place the Waste Tank to the plate1");
+	else
+		SetTextValue(TIPS1PAGE_INDEX, TIPS1_TIPS_EDIT, "请将废液槽置于【板号1】位置");
+
+	beepAlarm(1);
+	while(pProjectMan->tipsButton == TIPS_NONE);
+		
 	pProjectMan->tipsButton = TIPS_NONE;
 	SetScreen(PURGEPAGE_INDEX);//跳转到清洗页面
-	
-	SetTextValue(PURGEPAGE_INDEX, PURGE_STATUS_EDIT, "Preparation finish");
+
+	if(pProjectMan->lang == 0)	
+		SetTextValue(PURGEPAGE_INDEX, PURGE_STATUS_EDIT, "Preparation finish!");
+	else
+		SetTextValue(PURGEPAGE_INDEX, PURGE_STATUS_EDIT, "准备完成！");
 
 	//清洗要清洗的管道
+	//pStepMotor->offset = STEPMOTOR_PUMP_OFFSET;
+	pStepMotor->offset = pProjectMan->posCali2;
 	for(i=0;i<8;i++)
 	{
 		if(pProjectMan->purgePumpSel & (0x01<<i))
 		{
-			sprintf(str, "Washing the tube %d", i+1);
+			if(pProjectMan->lang == 0)
+				sprintf(str, "Washing the tube %d ……", i+1);
+			else
+				sprintf(str, "清洗【管道%d】中……", i+1);
 			SetTextValue(PURGEPAGE_INDEX, PURGE_STATUS_EDIT, str);
 
 			//将废液槽转到对应的泵位置
@@ -719,24 +974,36 @@ void purgeProgram(void)
 			SetTextValue(PURGEPAGE_INDEX, PURGE_STATUS_EDIT, "");
 		}
 	}
+	//pStepMotor->offset = STEPMOTOR_OFFSET;
+	pStepMotor->offset = pProjectMan->posCali1;
 	
 	//吸取废液
 	wasteFluidAbsorb();
 
 	//提示将要清洗的管道置于清洁干燥处
 	SetScreen(TIPS1PAGE_INDEX);//跳转到提示2页面
-	SetTextValue(TIPS1PAGE_INDEX, TIPS1_TIPS_EDIT, "Please place the tubes that to be washed in the clean and dry place");
-	while(pProjectMan->tipsButton == TIPS_NONE)
-		beepAlarm(1);
+	if(pProjectMan->lang == 0)
+		SetTextValue(TIPS1PAGE_INDEX, TIPS1_TIPS_EDIT, "Please place the tubes that to be washed in the clean and dry place");
+	else
+		SetTextValue(TIPS1PAGE_INDEX, TIPS1_TIPS_EDIT, "请将要清洗的管道置于清洁干燥处");
+
+	beepAlarm(1);
+	while(pProjectMan->tipsButton == TIPS_NONE);
+		
 	pProjectMan->tipsButton = TIPS_NONE;
 	SetScreen(PURGEPAGE_INDEX);//跳转到清洗页面
 
 	//抽干要清洗的管道
+	//pStepMotor->offset = STEPMOTOR_PUMP_OFFSET;
+	pStepMotor->offset = pProjectMan->posCali2;
 	for(i=0;i<8;i++)
 	{
 		if(pProjectMan->purgePumpSel & (0x01<<i))
 		{
-			sprintf(str, "Pumping water from the tube %d", i+1);
+			if(pProjectMan->lang == 0)
+				sprintf(str, "Pumping water from the tube %d", i+1);
+			else
+				sprintf(str, "抽空【管道%d】中……", i+1);
 			SetTextValue(PURGEPAGE_INDEX, PURGE_STATUS_EDIT, str);
 
 			//将废液槽转到对应的泵位置
@@ -753,6 +1020,8 @@ void purgeProgram(void)
 			SetTextValue(PURGEPAGE_INDEX, PURGE_STATUS_EDIT, "");
 		}
 	}
+	//pStepMotor->offset = STEPMOTOR_OFFSET;
+	pStepMotor->offset = pProjectMan->posCali1;
 
 	//吸取废液
 	wasteFluidAbsorb();
@@ -763,21 +1032,34 @@ void purgeProgram(void)
 
 	//提示取走废液槽
 	SetScreen(TIPS1PAGE_INDEX);//跳转到提示2页面
-	SetTextValue(TIPS1PAGE_INDEX, TIPS1_TIPS_EDIT, "Please take away the Waste Tank");
-	while(pProjectMan->tipsButton == TIPS_NONE)
-		beepAlarm(1);
+	if(pProjectMan->lang == 0)
+		SetTextValue(TIPS1PAGE_INDEX, TIPS1_TIPS_EDIT, "Please take away the Waste Tank");
+	else
+		SetTextValue(TIPS1PAGE_INDEX, TIPS1_TIPS_EDIT, "请移走废液槽");
+	
+	beepAlarm(1);	
+	while(pProjectMan->tipsButton == TIPS_NONE);
+	
 	pProjectMan->tipsButton = TIPS_NONE;
 	SetScreen(PURGEPAGE_INDEX);//跳转到清洗页面
 
 	//提示清洗完成
 	SetScreen(TIPS1PAGE_INDEX);//跳转到提示2页面
-	SetTextValue(TIPS1PAGE_INDEX, TIPS1_TIPS_EDIT, "Wash finish");
-	while(pProjectMan->tipsButton == TIPS_NONE)
-		beepAlarm(1);
+	if(pProjectMan->lang == 0)
+		SetTextValue(TIPS1PAGE_INDEX, TIPS1_TIPS_EDIT, "Wash finish!");
+	else
+		SetTextValue(TIPS1PAGE_INDEX, TIPS1_TIPS_EDIT, "清洗完成!");
+
+	beepAlarm(1);
+	while(pProjectMan->tipsButton == TIPS_NONE);
+	
 	pProjectMan->tipsButton = TIPS_NONE;
 	SetScreen(PURGEPAGE_INDEX);//跳转到清洗页面
 
-	SetTextValue(PURGEPAGE_INDEX, PURGE_STATUS_EDIT, "Wash finish");
+	if(pProjectMan->lang == 0)
+		SetTextValue(PURGEPAGE_INDEX, PURGE_STATUS_EDIT, "Wash finish!");
+	else
+		SetTextValue(PURGEPAGE_INDEX, PURGE_STATUS_EDIT, "清洗完成!");
 
 	SetButtonValue(PURGEPAGE_INDEX, PURGE_START_BUTTON, 0x00); //设置按键为弹起状态
 	SetControlVisiable(PURGEPAGE_INDEX, PURGE_START_BUTTON, 1);
@@ -795,6 +1077,10 @@ void purgeProgram(void)
 
 void homeProgram(void)
 {
+	
+	//拉起废液口
+	pDCMotor->WastePump_SetPos(UP);
+
 	//回原点
 	pStepMotor->Home();
 	SetScreen(MAINPAGE_INDEX);
@@ -805,22 +1091,25 @@ void homeProgram(void)
 void calibraProgram(void)
 {
 	uint8_t i;
-	float time = 4.0*pProjectMan->pCaliPumpPara[pProjectMan->caliPumpSel];
+	float time = pProjectMan->pCaliPumpPara[pProjectMan->caliPumpSel];
 	//cDebug("========caliPage start to run the PUMP program!\n");
 
 //	cDebug("pProjectMan->caliPumpSel = %d\n", (uint16_t)pProjectMan->caliPumpSel);
 //	pDCMotor->SetCMD(pProjectMan->caliPumpSel, ENABLE);
 //	os_wait(K_TMO, 1000, 0);
 //	pDCMotor->SetCMD(pProjectMan->caliPumpSel, DISABLE);
-
-	//直流电机运行40次
-	for(i=0;i<20;i++)
+	
+	pDCMotor->SetCMD(pProjectMan->caliPumpSel, ENABLE);
+	//直流电机运行40次的1mL，所以共40mL
+	for(i=0;i<40;i++)
 	{
-		pDCMotor->SetCMD(pProjectMan->caliPumpSel, ENABLE);
-		os_wait(K_TMO, 150*time, 0);
-		pDCMotor->SetCMD(pProjectMan->caliPumpSel, DISABLE);
-		os_wait(K_TMO, 50, 0);
+		os_wait(K_TMO, 10*time, 0);
+		os_wait(K_TMO, 10*time, 0);
+		os_wait(K_TMO, 10*time, 0);
+		os_wait(K_TMO, 10*time, 0);
+		os_wait(K_TMO, 10*time, 0);
 	}
+	pDCMotor->SetCMD(pProjectMan->caliPumpSel, DISABLE);
 
 	SetControlEnable(CALIBRATIONPAGE_INDEX, CALI_PUMPSELECT_BUTTON, 1);
 	SetControlEnable(CALIBRATIONPAGE_INDEX, CALI_START_BUTTON, 1);

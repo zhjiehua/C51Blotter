@@ -22,64 +22,36 @@ sbit S_STEP2 = P3^4;
 #define STEPMOTOR_ANGLEPERSTEP  1.8  //步进电机步距角  
 #define STEPMOTOR_FREDIV  128  //步进电机分频系数
 #define STEPMOTOR_PULSEPERROUND  ((360/STEPMOTOR_ANGLEPERSTEP)*STEPMOTOR_FREDIV)  //步进电机每转需要多少个脉冲
-#define STEPMOTOR_OFFSET  800  //电机要对准槽孔，需要偏移
+#define STEPMOTOR_OFFSET  1400  //废液口要对准槽孔，需要偏移
+
+#define STEPMOTOR_PUMP_OFFSET  100 //蠕动泵对准
 
 #define SPEED_CONST  600 //用于加减速的步进时间常数
 
-#define SPEED_POSITION1 2  //定位距离为1的速度
-#define SPEED_POSITION2 5  //定位距离为2的速度
-#define SPEDD_POSITION  8  //定位距离大于3的速度
-#define SPEDD_HOME	    8  //回原点的速度
-#define SPEDD_SLOW	    5  //孵育速度-慢
-#define SPEDD_MIDDLE    9  //孵育速度-中
-#define SPEDD_FAST	    13 //孵育速度-快
+#if 0
+	#define SPEED_POSITION1 3  //定位距离为1的速度
+	#define SPEED_POSITION2 9  //定位距离为2的速度
+	#define SPEDD_POSITION  13  //定位距离大于3的速度
+	#define SPEDD_HOME	    13  //回原点的速度
+	#define SPEDD_SLOW	    9  //孵育速度-慢
+	#define SPEDD_MIDDLE    14  //孵育速度-中
+	#define SPEDD_FAST	    17 //孵育速度-快
+#else
+	#define SPEED_POSITION1 2  //定位距离为1的速度
+	#define SPEED_POSITION2 5  //定位距离为2的速度
+	#define SPEDD_POSITION  8  //定位距离大于3的速度
+	#define SPEDD_HOME	    8  //回原点的速度
+	#define SPEDD_SLOW	    5  //孵育速度-慢
+	#define SPEDD_MIDDLE    9  //孵育速度-中
+	#define SPEDD_FAST	    13 //孵育速度-快
+#endif
 
 #define TANK_COUNT 50
 #define TANK_PER_PLATE 5
 
-/*单片机定时器1工作于12T模式时*/
-//#define F0R1 (65536-FOSC/2/12/(STEPMOTOR_PULSEPERROUND*0.1))
-//#define F0R2 (65536-FOSC/2/12/(STEPMOTOR_PULSEPERROUND*0.2)) //正常工作速度
-//#define F0R3 (65536-FOSC/2/12/(STEPMOTOR_PULSEPERROUND*0.3))
-//#define F0R5 (65536-FOSC/2/12/(STEPMOTOR_PULSEPERROUND*0.5))
-//#define F0R7 (65536-FOSC/2/12/(STEPMOTOR_PULSEPERROUND*0.7))
-//#define F1R  (65536-FOSC/2/12/(STEPMOTOR_PULSEPERROUND*1))
-//#define F1R3 (65536-FOSC/2/12/(STEPMOTOR_PULSEPERROUND*1.3))
-//#define F1R6 (65536-FOSC/2/12/(STEPMOTOR_PULSEPERROUND*1.6))
-
-/*单片机定时器1工作于1T模式时*/
-#define F0R1 (65536-FOSC/2/(STEPMOTOR_PULSEPERROUND*0.1))
-#define F0R2 (65536-FOSC/2/(STEPMOTOR_PULSEPERROUND*0.2)) //正常工作速度
-#define F0R3 (65536-FOSC/2/(STEPMOTOR_PULSEPERROUND*0.3))
-#define F0R5 (65536-FOSC/2/(STEPMOTOR_PULSEPERROUND*0.5))
-#define F0R7 (65536-FOSC/2/(STEPMOTOR_PULSEPERROUND*0.7))
-#define F1R  (65536-FOSC/2/(STEPMOTOR_PULSEPERROUND*1))
-#define F1R3 (65536-FOSC/2/(STEPMOTOR_PULSEPERROUND*1.3))
-#define F1R6 (65536-FOSC/2/(STEPMOTOR_PULSEPERROUND*1.6))
-#define F2R  (65536-FOSC/2/(STEPMOTOR_PULSEPERROUND*2))
-#define F2R5 (65536-FOSC/2/(STEPMOTOR_PULSEPERROUND*2.5))
-#define F3R  (65536-FOSC/2/(STEPMOTOR_PULSEPERROUND*3))
-#define F3R5 (65536-FOSC/2/(STEPMOTOR_PULSEPERROUND*3.5))
-#define F4R  (65536-FOSC/2/(STEPMOTOR_PULSEPERROUND*4))
-
 #define STEPMOTOR_FREQ(r) (65536-FOSC/2/(STEPMOTOR_PULSEPERROUND*(r)))
 
 #define SIZEOF(x) (sizeof(x)/sizeof((x)[0]))
-
-//typedef enum
-//{
-//	POS_PUMP1 = 1,
-//	POS_PUMP2 = 50,
-//	POS_PUMP3 = 49,
-//	POS_PUMP4 = 48,
-//	POS_PUMP5 = 47,
-//	POS_PUMP6 = 46,
-//	POS_PUMP7 = 45,
-//	POS_PUMP8 = 44,
-//
-//	POS_WASTE = 23,  //废液口
-//	POS_HANDLE = 28, //手动点
-//}AbsPos_TypeDef;
 
 typedef struct
 {

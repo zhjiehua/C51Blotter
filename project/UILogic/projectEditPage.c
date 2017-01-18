@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-void projectEditPageButtonProcess(uint16 control_id, uint8  state)
+void projectEditPageButtonProcess(uint16 control_id, uint8 state)
 {
 	switch(control_id)
 	{
@@ -81,11 +81,21 @@ void projectEditPageButtonProcess(uint16 control_id, uint8  state)
 		case PROEDIT_EDITACTION_BUTTON:  //跳到动作页面，更新动作页面控件信息
 			{
 				SetTextValue(ACTIONPAGE_INDEX, ACTEDIT_PUMPSEL_EDIT, actionPumpMenuText[pProjectMan->pCurEditAction->pump]);
-				SetTextValue(ACTIONPAGE_INDEX, ACTEDIT_TIPSSEL_EDIT, actionTipsMenuText[pProjectMan->pCurEditAction->tips]);
-				SetTextValue(ACTIONPAGE_INDEX, ACTEDIT_VOICESEL_EDIT, actionVoiceMenuText[pProjectMan->pCurEditAction->voice]);
-				SetTextValueFloat(ACTIONPAGE_INDEX, ACTEDIT_ADDAMOUNT_EDIT, pProjectMan->pCurEditAction->addAmount);
+			  	if(pProjectMan->lang == 0)
+				{
+					SetTextValue(ACTIONPAGE_INDEX, ACTEDIT_TIPSSEL_EDIT, actionTipsMenuText[pProjectMan->pCurEditAction->tips]);
+					SetTextValue(ACTIONPAGE_INDEX, ACTEDIT_VOICESEL_EDIT, actionVoiceMenuText[pProjectMan->pCurEditAction->voice]);
+					SetTextValue(ACTIONPAGE_INDEX, ACTEDIT_SPEEDSEL_EDIT, actionSpeedMenuText[pProjectMan->pCurEditAction->shakeSpeed]);
+			   	}
+				else
+				{
+					SetTextValue(ACTIONPAGE_INDEX, ACTEDIT_TIPSSEL_EDIT, actionTipsMenuTextCh[pProjectMan->pCurEditAction->tips]);
+					SetTextValue(ACTIONPAGE_INDEX, ACTEDIT_VOICESEL_EDIT, actionVoiceMenuTextCh[pProjectMan->pCurEditAction->voice]);
+					SetTextValue(ACTIONPAGE_INDEX, ACTEDIT_SPEEDSEL_EDIT, actionSpeedMenuTextCh[pProjectMan->pCurEditAction->shakeSpeed]);
+					cDebug("projectEditPage actionSpeedMenuTextCh[%d] = %s!\n", (uint16_t)pProjectMan->pCurEditAction->shakeSpeed, actionSpeedMenuTextCh[pProjectMan->pCurEditAction->shakeSpeed]);					
+				}
+				SetTextValueInt32(ACTIONPAGE_INDEX, ACTEDIT_ADDAMOUNT_EDIT, pProjectMan->pCurEditAction->addAmount);
 				SetTextValueInt32(ACTIONPAGE_INDEX, ACTEDIT_IMBIAMOUNT_EDIT, pProjectMan->pCurEditAction->imbiAmount);
-				SetTextValue(ACTIONPAGE_INDEX, ACTEDIT_SPEEDSEL_EDIT, actionSpeedMenuText[pProjectMan->pCurEditAction->shakeSpeed]);
 				SetTextValueInt32(ACTIONPAGE_INDEX, ACTEDIT_TIMEHOUR_EDIT, pProjectMan->pCurEditAction->shakeTime.hour);
 				SetTextValueInt32(ACTIONPAGE_INDEX, ACTEDIT_TIMEMIN_EDIT, pProjectMan->pCurEditAction->shakeTime.minute);
 				SetTextValueInt32(ACTIONPAGE_INDEX, ACTEDIT_LOOPTIME_EDIT, pProjectMan->pCurEditAction->loopTime);
@@ -99,7 +109,6 @@ void projectEditPageButtonProcess(uint16 control_id, uint8  state)
 				pProjectMan->shakeTime.hour = pProjectMan->pCurEditAction->shakeTime.hour;
 				pProjectMan->shakeTime.minute = pProjectMan->pCurEditAction->shakeTime.minute;
 				pProjectMan->loopTime = pProjectMan->pCurEditAction->loopTime;
-
 			}
 		break;
 		case PROEDIT_BACK_BUTTON:

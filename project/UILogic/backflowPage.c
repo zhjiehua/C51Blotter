@@ -1,6 +1,7 @@
 #include "pageCommon.h"
 #include "managerment.h"
 #include "CPrintf.h"
+#include "../Peripheral/dcmotor.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -11,14 +12,18 @@ void backflowPageButtonProcess(uint16 control_id, uint8  state)
 	switch(control_id)
 	{
 		case BACKFLOW_PUMP1_BUTTON:
-		{
-			state ? (pProjectMan->backflowPumpSel |= PUMP1_MASK) : (pProjectMan->backflowPumpSel &= ~PUMP1_MASK);
-		}
-		break;
+			{
+				state ? (pProjectMan->backflowPumpSel |= PUMP1_MASK) : (pProjectMan->backflowPumpSel &= ~PUMP1_MASK);
+			}
+			//松开夹管阀
+			pDCMotor->SetSpeed(PUMP_PINCH, 0);
+			break;
 		case BACKFLOW_PUMP2_BUTTON:
 			{
 				state ? (pProjectMan->backflowPumpSel |= PUMP2_MASK) : (pProjectMan->backflowPumpSel &= ~PUMP2_MASK);
 			}
+			//松开夹管阀
+			pDCMotor->SetSpeed(PUMP_PINCH, 100);
 			break;
 		case BACKFLOW_PUMP3_BUTTON:
 			{
@@ -52,7 +57,7 @@ void backflowPageButtonProcess(uint16 control_id, uint8  state)
 			break;
 		case BACKFLOW_OK_BUTTON:
 			{
-				cDebug("========backflowPage start to run the BACKFLOW program!\n");
+				cDebug("running backflow program!\n");
 			}
 			break;
 		case BACKFLOW_BACK_BUTTON:

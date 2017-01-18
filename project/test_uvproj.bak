@@ -278,13 +278,13 @@
             </OnChipMemories>
           </Target51Misc>
           <C51>
-            <RegisterColoring>0</RegisterColoring>
+            <RegisterColoring>1</RegisterColoring>
             <VariablesInOrder>0</VariablesInOrder>
             <IntegerPromotion>1</IntegerPromotion>
             <uAregs>0</uAregs>
             <UseInterruptVector>1</UseInterruptVector>
             <Fuzzy>3</Fuzzy>
-            <Optimize>1</Optimize>
+            <Optimize>9</Optimize>
             <WarningLevel>0</WarningLevel>
             <SizeSpeed>1</SizeSpeed>
             <ObjectExtend>1</ObjectExtend>
@@ -565,6 +565,11 @@
               <FileType>1</FileType>
               <FilePath>.\UILogic\tips2Page.c</FilePath>
             </File>
+            <File>
+              <FileName>informationPage.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\UILogic\informationPage.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -599,6 +604,16 @@
               <FileName>eeprom.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Peripheral\eeprom.c</FilePath>
+            </File>
+            <File>
+              <FileName>24cxx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Peripheral\24cxx.c</FilePath>
+            </File>
+            <File>
+              <FileName>myiic.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Peripheral\myiic.c</FilePath>
             </File>
           </Files>
         </Group>
